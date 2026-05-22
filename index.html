@@ -694,11 +694,13 @@
             document.getElementById('campoOrigem').addEventListener('input', atualizarDistanciaGoogleMaps);
             document.getElementById('campoDestino').addEventListener('input', atualizarDistanciaGoogleMaps);
             document.getElementById('campoDistanciaManual').addEventListener('input', atualizarDistanciaGoogleMaps);
-          if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js')
-    .then(reg => console.log('SW registrado com sucesso', reg))
-    .catch(err => console.error('Erro no SW:', err));
-           }  
+            if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(e=>console.log);
+        } catch(e) {
+            console.error('Erro na inicialização:', e);
+        } finally {
+            ocultarTelaCarregamento();
+        }
+    };
 </script>
 </body>
 </html>
