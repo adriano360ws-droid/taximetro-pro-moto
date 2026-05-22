@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/taximetro-pro-moto/manifest.json">
+    <meta name="theme-color" content="#0A5CBF">
+    <title>Taxímetro Pro - Moto</title>
+    <style>
+        * {margin:0; padding:0; box-sizing:border-box; font-family:Arial;}
+        body {background:#E3F2FD; text-align:center; padding:20px;}
+        .box {background:white; border-radius:16px; padding:20px; margin:10px auto; max-width:400px;}
+        h1 {color:#0A5CBF; margin-bottom:15px;}
+        #valor {font-size:4em; color:#0A5CBF; font-weight:bold; margin:15px 0;}
+        button {background:#0A5CBF; color:white; border:none; padding:14px; border-radius:12px; width:45%; margin:5px; font-weight:bold;}
+        .parar {background:#EF5350;}
+    </style>
+</head>
+<body>
+
+    <h1>🏍️ Taxímetro Pro - Moto</h1>
+    <div class="box">
+        <div id="valor">R$ 0,00</div>
+        <p>Distância: <span id="dist">0.00 km</span></p>
+        <p>Tempo: <span id="tempo">00:00</span></p>
+    </div>
+
+    <button onclick="alert('Iniciado!')">INICIAR</button>
+    <button class="parar" onclick="alert('Parado!')">PARAR</button>
+
+    <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/taximetro-pro-moto/sw.js')
+          .then(reg => console.log('✅ Service Worker registrado!', reg))
+          .catch(err => console.log('❌ Erro:', err));
+      });
+    }
+    </script>
+</body>
+</html>
