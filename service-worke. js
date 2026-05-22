@@ -1,32 +1,33 @@
-const CACHE_NAME = 'taximetro-v1';
-const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icone.png'
+const CACHE_NAME = 'taximetro-app-v2';
+const ARQUIVOS = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icone.png'
 ];
 
-// Instalar e salvar arquivos no cache
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(ARQUIVOS);
+    })
   );
 });
 
-// Ativar
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then(keys => 
-      Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-      )
-    )
+    caches.keys().then(nomes => {
+      return Promise.all(
+        nomes.filter(nome => nome !== CACHE_NAME).map(nome => caches.delete(nome))
+      );
+    })
   );
 });
 
-// Buscar arquivos do cache
 self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then(res => res || fetch(e.request))
+    caches.match(e.request).then(resposta => {
+      return resposta || fetch(e.request);
+    })
   );
 });
