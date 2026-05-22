@@ -1,1 +1,19 @@
-
+{
+  "name": "Taxímetro Pro - Moto",
+  "short_name": "Taxímetro",
+  "description": "Calculadora de tarifa para moto táxi",
+  "start_url": "/taximetro-pro-moto/",
+  "scope": "/taximetro-pro-moto/",
+  "display": "standalone",
+  "background_color": "#E3F2FD",
+  "theme_color": "#0A5CBF",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/128/1059/1059177.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
