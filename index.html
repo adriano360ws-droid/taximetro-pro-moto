@@ -315,10 +315,10 @@
 
     function arredondarParaCima10cent(valor) { return Math.ceil(valor * 10) / 10; }
 
-    function calcularValorTotal(distanciaKm) {
-        const valorBase = tarifaAtual.bandeira + (distanciaKm * tarifaAtual.km);
+    function calcularValorTotal(distanciaKm, tarifa = tarifaAtual) {
+        const valorBase = tarifa.bandeira + (distanciaKm * tarifa.km);
         let valor = arredondarParaCima10cent(valorBase);
-        if (valor < tarifaAtual.minimo) valor = tarifaAtual.minimo;
+        if (valor < tarifa.minimo) valor = tarifa.minimo;
         return valor;
     }
 
@@ -387,18 +387,58 @@
         salvarCorridaNoHistorico();
     }
 
+    // ✅ FUNÇÃO DE SIMULAÇÃO CORRIGIDA E COMPLETA
+    function gerarTabelaSimulacao() {
+        const container = document.getElementById('tabelaSimulacao');
+        let html = '<table id="tabelaSimulacao"><thead><tr><th>Distância</th><th>☀️ Dia</th><th>🌙 Noite</th><th>🔥 Fim Semana</th></tr></thead><tbody>';
+        
+        // Gera de 0.1km até 80km, de 0.5 em 0.5km
+        for (let km = 0.1; km <= 80; km += 0.5) {
+            const valDia = calcularValorTotal(km, tarifas.dia);
+            const valNoite = calcularValorTotal(km, tarifas.noite);
+            const valFim = calcularValorTotal(km, tarifas.fimSemana);
+            
+            html += `
+            <tr>
+                <td>${km.toFixed(1)} km</td>
+                <td>R$ ${valDia.toFixed(2).replace('.', ',')}</td>
+                <td>R$ ${valNoite.toFixed(2).replace('.', ',')}</td>
+                <td>R$ ${valFim.toFixed(2).replace('.', ',')}</td>
+            </tr>`;
+        }
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+
+    function abrirSimulacao() {
+        gerarTabelaSimulacao(); // ✅ Agora gera os dados antes de abrir
+        document.getElementById('simulacaoTarifas').style.display = 'block';
+    }
+
     // ---------- OUTRAS FUNÇÕES ----------
     function alternarModoEscuro() { document.body.classList.toggle('dark-mode'); }
     function alternarModoEconomia() { modoEconomia = !modoEconomia; alert('Modo economia ' + (modoEconomia ? 'ativado' : 'desativado')); }
     function abrirTelaConfiguracoes() { atualizarTabelaTarifasUI(); document.getElementById('telaConfiguracoes').style.display = 'block'; }
     function abrirRotaGoogleMaps() { alert('Função de rota aberta!'); }
     function abrirTabelaTarifas() { document.getElementById('tabelaTarifas').style.display = 'block'; }
-    function abrirSimulacao() { document.getElementById('simulacaoTarifas').style.display = 'block'; }
     function compartilharWhatsapp() { alert('Compartilhado no WhatsApp!'); }
     function gerarCodigoPix() { alert('Código PIX gerado!'); }
     function enviarLinkPassageiro() { alert('Link enviado!'); }
     function fecharJanela(id) { document.getElementById(id).style.display = 'none'; }
-    function salvarTodasTarifas() { alert('Tarifas salvas!'); fecharJanela('telaConfiguracoes'); }
+    function salvarTodasTarifas() { 
+        tarifas.dia.bandeira = parseFloat(document.getElementById('diaBandeira').value);
+        tarifas.dia.km = parseFloat(document.getElementById('diaKm').value);
+        tarifas.dia.minimo = parseFloat(document.getElementById('diaMinimo').value);
+        tarifas.noite.bandeira = parseFloat(document.getElementById('noiteBandeira').value);
+        tarifas.noite.km = parseFloat(document.getElementById('noiteKm').value);
+        tarifas.noite.minimo = parseFloat(document.getElementById('noiteMinimo').value);
+        tarifas.fimSemana.bandeira = parseFloat(document.getElementById('fimSemanaBandeira').value);
+        tarifas.fimSemana.km = parseFloat(document.getElementById('fimSemanaKm').value);
+        tarifas.fimSemana.minimo = parseFloat(document.getElementById('fimSemanaMinimo').value);
+        atualizarTabelaTarifasUI();
+        alert('✅ Tarifas salvas!'); 
+        fecharJanela('telaConfiguracoes'); 
+    }
     function salvarCorridaNoHistorico() { historicoCorridas.push({data: new Date(), distancia: distanciaPercorrida, valor: calcularValorTotal(distanciaPercorrida)}); atualizarListaCorridas(); }
     function limparCorridasHoje() { historicoCorridas = []; atualizarListaCorridas(); }
     function limparTodoHistorico() { historicoCorridas = []; atualizarListaCorridas(); }
