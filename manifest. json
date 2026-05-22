@@ -1,24 +1,21 @@
 {
-  "name": "Taxímetro Pro Moto",
-  "short_name": "Táxi Moto",
-  "start_url": "./index.html",
+  "name": "Taxímetro Pro - Moto",
+  "short_name": "Taxímetro Moto",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#0A5CBF",
+  "background_color": "#E3F2FD",
   "theme_color": "#0A5CBF",
-  "description": "App de taxímetro profissional exclusivo para moto com GPS offline, PIX configurável e link dinâmico",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "icone-192.png",
+      "src": "icone.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "icone-512.png",
+      "src": "icone.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
-  ],
-  "lang": "pt-BR"
+  ]
 }
