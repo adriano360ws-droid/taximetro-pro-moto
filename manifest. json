@@ -1,21 +1,25 @@
 {
   "name": "Taxímetro Pro - Moto",
-  "short_name": "Taxímetro Moto",
-  "start_url": "/",
+  "short_name": "Taxímetro",
+  "description": "Calculadora de tarifa para moto táxi",
+  "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#E3F2FD",
   "theme_color": "#0A5CBF",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "icone.png",
+      "src": "./icone.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "icone.png",
+      "src": "./icone.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
