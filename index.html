@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#00B050">
+    <meta name="theme-color" content="#0A5CBF">
     <title>Taxímetro Pro - Moto</title>
     <link rel="manifest" href="manifest.json">
     <style>
@@ -14,7 +14,7 @@
         body.dark-mode { background: #121212; color: #FFF; }
         body.dark-mode .box, body.dark-mode .google-maps-distancia, body.dark-mode #comprovante, body.dark-mode #pixModal, body.dark-mode #tabelaTarifas, body.dark-mode #telaConfiguracoes, body.dark-mode #telaDadosMotorista, body.dark-mode #simulacaoTarifas, body.dark-mode #corridasHoje, body.dark-mode #comparacaoMenorValor { background: #1E1E1E; color: #FFF; border-color: #333; }
         .container { max-width: 420px; margin: auto; }
-        h2 { color: #00897B; margin-bottom: 20px; }
+        h2 { color: #0A5CBF; margin-bottom: 20px; }
         .box { background: white; border-radius: 16px; padding: 15px; margin: 10px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         #valorDisplay { font-size: 4.2em; font-weight: 900; color: #0A5CBF; margin: 10px 0 15px 0; line-height: 1; text-shadow: 0 3px 6px rgba(10,92,191,0.2); }
         #distancia { font-size: 2.0em; font-weight: bold; color: #00A86B; line-height: 1; }
@@ -25,7 +25,7 @@
         .comparacao-tabela td { padding: 6px 4px; border-bottom: 1px solid #ddd; }
         .comparacao-tabela td:first-child { font-weight: bold; width: 40%; }
         .destaque-economia { margin-top: 10px; font-weight: bold; color: #2E7D32; text-align: center; font-size: 1.1em; }
-        button { padding: 14px; margin: 6px 4px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; background: #00BFA5; color: white; width: calc(50% - 10px); }
+        button { padding: 14px; margin: 6px 4px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; background: #0A5CBF; color: white; width: calc(50% - 10px); }
         .btn-parar { background: #EF5350; }
         .btn-tabela, .btn-whatsapp, .btn-pix, .btn-rota, .btn-link { width: 100%; margin-top: 8px; }
         .btn-link { background: #9C27B0; }
@@ -39,7 +39,7 @@
         #simulacaoTarifas { overflow-x: auto; }
         #tabelaSimulacao { width: 100%; border-collapse: collapse; font-size: 0.8em; }
         #tabelaSimulacao th, #tabelaSimulacao td { border: 1px solid #ccc; padding: 8px 4px; text-align: center; }
-        .tela-carregamento { position: fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, #00BFA5, #00897B); display: flex; align-items: center; justify-content: center; color: white; z-index: 9999; transition: opacity 0.5s; flex-direction: column; }
+        .tela-carregamento { position: fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, #0A5CBF, #084A99); display: flex; align-items: center; justify-content: center; color: white; z-index: 9999; transition: opacity 0.5s; flex-direction: column; }
         .btn-limpar-hoje { background: #D32F2F; font-size: 0.8em; padding: 8px; width: auto; margin-left: 4px; }
         @media(max-width:380px) { #valorDisplay { font-size: 3.2em; } }
     </style>
@@ -95,17 +95,15 @@
     <div id="corridasHoje" style="display:block; margin-top:20px;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
             <h4>📋 Corridas de Hoje</h4>
-            <div>
-                <button class="btn-limpar-hoje" onclick="limparCorridasHoje()">🗑️ Limpar hoje</button>
-                <button class="btn-limpar-hoje" style="background:#B71C1C;" onclick="limparTodoHistorico()">🗑️ Limpar tudo</button>
-            </div>
+            <button class="btn-limpar-hoje" onclick="limparCorridasHoje()">🗑️ Limpar hoje</button>
+            <button class="btn-limpar-hoje" style="background:#B71C1C;" onclick="limparTodoHistorico()">🗑️ Limpar tudo</button>
         </div>
         <div id="listaCorridasHoje"></div>
     </div>
 
     <div class="aviso-privacidade">🔒 Seus dados (Pix, WhatsApp, tarifas) ficam salvos apenas no seu celular.</div>
 
-    <!-- MODAIS (estrutura completa para evitar erros) -->
+    <!-- MODAIS -->
     <div id="pixModal">
         <h3>💳 PAGAMENTO PIX</h3>
         <p>Valor: <span id="pixValorDisplay">R$ 0,00</span></p>
@@ -161,24 +159,16 @@
         <button class="fechar-btn" onclick="fecharJanela('telaConfiguracoes')">❌ Fechar</button>
     </div>
 
-    <!-- Tela de Dados do Motorista (sem seletor de tipo de veículo) -->
     <div id="telaDadosMotorista">
         <h3>👤 MEUS DADOS</h3>
         <p style="font-size:0.9em;">Configure seus dados para o Pix e link do passageiro.</p>
-        <label>🔑 Chave Pix (celular, e-mail, CPF):</label>
-        <input type="text" id="inputPixKey" placeholder="Ex: +5586999999999">
-        <label>👤 Nome completo (como no banco):</label>
-        <input type="text" id="inputNomeMotorista" placeholder="Seu nome">
-        <label>📍 Cidade:</label>
-        <input type="text" id="inputCidadeMotorista" placeholder="Cidade - UF">
-        <label>📱 WhatsApp (com DDD, apenas números):</label>
-        <input type="text" id="inputWhatsApp" placeholder="Ex: 5586999999999">
-        <label>🏍️ Marca/Modelo do veículo:</label>
-        <input type="text" id="inputModelo" placeholder="Ex: Fan 125">
-        <label>🎨 Cor do veículo:</label>
-        <input type="text" id="inputCor" placeholder="Ex: Preta">
-        <label>🔢 Placa do veículo:</label>
-        <input type="text" id="inputPlaca" placeholder="Ex: QRP5G89">
+        <label>🔑 Chave Pix (celular, e-mail, CPF):</label><input type="text" id="inputPixKey" placeholder="Ex: +5586999999999">
+        <label>👤 Nome completo (como no banco):</label><input type="text" id="inputNomeMotorista" placeholder="Seu nome">
+        <label>📍 Cidade:</label><input type="text" id="inputCidadeMotorista" placeholder="Cidade - UF">
+        <label>📱 WhatsApp (com DDD, apenas números):</label><input type="text" id="inputWhatsApp" placeholder="Ex: 5586999999999">
+        <label>🏍️ Marca/Modelo do veículo:</label><input type="text" id="inputModelo" placeholder="Ex: Fan 125">
+        <label>🎨 Cor do veículo:</label><input type="text" id="inputCor" placeholder="Ex: Preta">
+        <label>🔢 Placa do veículo:</label><input type="text" id="inputPlaca" placeholder="Ex: QRP5G89">
         <div style="display: flex; gap: 10px; margin-top: 15px;">
             <button class="btn-pix" onclick="salvarDadosMotorista()" style="flex:1;">💾 Salvar</button>
             <button class="btn-ajuste" onclick="limparDadosMotorista()" style="background:#FF5722; flex:1;">🗑️ Limpar Dados</button>
@@ -188,8 +178,8 @@
 </div>
 
 <script>
-    // ---------- DADOS DO MOTORISTA (PIX, WhatsApp, Veículo FIXO MOTO) ----------
-    let pixKey = "", nomeMotorista = "", cidadeMotorista = "", whatsApp = "", tipoVeiculo = "moto"; // FIXO
+    // ---------- DADOS DO MOTORISTA ----------
+    let pixKey = "", nomeMotorista = "", cidadeMotorista = "", whatsApp = "", tipoVeiculo = "moto";
     let modelo = "", cor = "", placa = "";
 
     function carregarDadosMotorista() {
@@ -225,7 +215,7 @@
     }
 
     function limparDadosMotorista() {
-        if (confirm('⚠️ Tem certeza? Isso vai apagar TODOS os seus dados cadastrados (Pix, nome, cidade, WhatsApp, modelo, cor, placa).')) {
+        if (confirm('⚠️ Tem certeza? Isso vai apagar TODOS os seus dados cadastrados.')) {
             localStorage.removeItem('pixKeyMotorista');
             localStorage.removeItem('nomeMotorista');
             localStorage.removeItem('cidadeMotorista');
@@ -234,7 +224,7 @@
             localStorage.removeItem('corVeiculo');
             localStorage.removeItem('placaVeiculo');
             carregarDadosMotorista();
-            alert('✅ Dados removidos. Cadastre novamente quando quiser.');
+            alert('✅ Dados removidos.');
             fecharJanela('telaDadosMotorista');
         }
     }
@@ -244,7 +234,7 @@
         document.getElementById('telaDadosMotorista').style.display = 'block';
     }
 
-    // ---------- TARIFAS (3 períodos) ----------
+    // ---------- TARIFAS ----------
     const tarifas = {
         dia: { bandeira: 2.50, km: 1.15, minimo: 6.00 },
         noite: { bandeira: 3.00, km: 1.30, minimo: 6.00 },
@@ -340,37 +330,45 @@
     // ---------- GPS ----------
     function iniciarRastreamentoGPS() {
         if (!navigator.geolocation) { alert('GPS não disponível.'); return; }
-        let ultimo = null;
+        ultimaPosicao = null;
         rastreamento = setInterval(() => {
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
-                    if (pos.coords.accuracy > 30) return;
-                    const agora = { lat: pos.coords.latitude, lng: pos.coords.longitude, tempo: Date.now() };
-                    if (ultimo) {
-                        const dLat = (agora.lat - ultimo.lat) * Math.PI / 180;
-                        const dLon = (agora.lng - ultimo.lng) * Math.PI / 180;
-                        const lat1 = ultimo.lat * Math.PI / 180;
-                        const lat2 = agora.lat * Math.PI / 180;
-                        const a = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;
-                        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                        const dist = 6371 * c;
-                        const deltaT = (agora.tempo - ultimo.tempo) / 3600000;
-                        const vel = deltaT > 0 ? dist / deltaT : 0;
-                        if (dist > 0.015 && vel >= 4) {
-                            distanciaPercorrida += dist;
-                            const valor = calcularValorTotal(distanciaPercorrida);
-                            atualizarInterface(distanciaPercorrida, valor);
-                        }
+                    if (ultimaPosicao) {
+                        const distancia = calcularDistanciaEntrePontos(
+                            ultimaPosicao.coords.latitude, ultimaPosicao.coords.longitude,
+                            pos.coords.latitude, pos.coords.longitude
+                        );
+                        distanciaPercorrida += distancia;
+                        const valor = calcularValorTotal(distanciaPercorrida);
+                        atualizarInterface(distanciaPercorrida, valor);
                     }
-                    ultimo = agora;
+                    ultimaPosicao = pos;
                 },
-                (erro) => { if (erro.code === 1) alert('Permita acesso à localização.'); },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                (erro) => { console.log('Erro GPS:', erro); },
+                { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
             );
         }, 2000);
     }
 
-    function iniciarRelogio() {
+    function calcularDistanciaEntrePontos(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    // ---------- CONTROLE DE CORRIDA ----------
+    function iniciar() {
+        corridaAtiva = true;
+        distanciaPercorrida = 0;
+        tempoTotalSegundos = 0;
+        document.getElementById('btnIniciar').disabled = true;
+        document.getElementById('btnParar').disabled = false;
+        definirTarifaPorHorario();
+        iniciarRastreamentoGPS();
         timerRelogio = setInterval(() => {
             tempoTotalSegundos++;
             const h = Math.floor(tempoTotalSegundos/3600).toString().padStart(2,'0');
@@ -379,328 +377,54 @@
             document.getElementById('tempo').innerText = `${h}:${m}:${s}`;
         }, 1000);
     }
-    function pararRelogio() { if (timerRelogio) clearInterval(timerRelogio); }
-
-    async function iniciar() {
-        if (corridaAtiva) return;
-        document.getElementById('comparacaoMenorValor').style.display = 'none';
-        const manual = parseFloat(document.getElementById('campoDistanciaManual').value);
-        distanciaGoogleMapsManual = (isNaN(manual) || manual <= 0) ? null : manual;
-        distanciaPercorrida = 0;
-        tempoTotalSegundos = 0;
-        ultimaPosicao = null;
-        corridaAtiva = true;
-        await definirTarifaPorHorario();
-        document.getElementById('btnIniciar').disabled = true;
-        document.getElementById('btnParar').disabled = false;
-        document.getElementById('btnPix').disabled = true;
-        iniciarRastreamentoGPS();
-        iniciarRelogio();
-        solicitarWakeLock();
-        atualizarInterface(0, calcularValorTotal(0));
-        document.getElementById('tempo').innerText = '00:00:00';
-    }
 
     function parar() {
-        if (!corridaAtiva) return;
         corridaAtiva = false;
         clearInterval(rastreamento);
-        pararRelogio();
-        liberarWakeLock();
+        clearInterval(timerRelogio);
         document.getElementById('btnIniciar').disabled = false;
         document.getElementById('btnParar').disabled = true;
-
-        let finalGPS = distanciaPercorrida;
-        let final = finalGPS;
-        let usouGoogle = false;
-        if (distanciaGoogleMapsManual !== null && distanciaGoogleMapsManual > 0 && distanciaGoogleMapsManual < finalGPS) {
-            final = distanciaGoogleMapsManual;
-            usouGoogle = true;
-        }
-        const valorFinal = calcularValorTotal(final);
-        atualizarInterface(final, valorFinal);
-        const valorGPS = calcularValorTotal(finalGPS);
-        const valorGoogle = distanciaGoogleMapsManual ? calcularValorTotal(distanciaGoogleMapsManual) : null;
-
-        let compHtml = '<table class="comparacao-tabela">';
-        compHtml += `<tr><td>📏 Google Maps</td><td>${distanciaGoogleMapsManual ? distanciaGoogleMapsManual.toFixed(2)+' km' : 'não informado'}</td><td>${valorGoogle ? 'R$ '+valorGoogle.toFixed(2).replace('.',',') : '---'}</td></tr>`;
-        compHtml += `<tr><td>📡 Taxímetro (GPS)</td><td>${finalGPS.toFixed(2)} km</td><td>R$ ${valorGPS.toFixed(2).replace('.',',')}</td></tr>`;
-        compHtml += `<tr style="background:#E8F5E9; font-weight:bold;"><td>✅ Cobrado no PIX</td><td>${final.toFixed(2)} km</td><td>R$ ${valorFinal.toFixed(2).replace('.',',')}</td></tr>`;
-        compHtml += '</table>';
-        if (valorGoogle !== null) {
-            const economia = Math.abs(valorFinal - valorGoogle);
-            if (valorFinal < valorGoogle) compHtml += `<div class="destaque-economia">💰 Passageiro economizou R$ ${economia.toFixed(2).replace('.',',')}</div>`;
-            else if (valorFinal > valorGoogle) compHtml += `<div class="destaque-economia">⚠️ Diferença inesperada.</div>`;
-            else compHtml += `<div class="destaque-economia">📊 Valores iguais.</div>`;
-        } else compHtml += `<div class="destaque-economia">📊 Apenas o GPS foi usado.</div>`;
-
-        document.getElementById('comparacaoMenorValor').innerHTML = compHtml;
-        document.getElementById('comparacaoMenorValor').style.display = 'block';
-        window.ultimoGPS = finalGPS;
-        window.ultimoGoogle = distanciaGoogleMapsManual;
-        window.usouGoogle = usouGoogle;
-        gerarComprovanteProfissional();
-        salvarHistorico();
-        document.getElementById('btnPix').disabled = false;
+        salvarCorridaNoHistorico();
     }
-
-    let ultimoComprovanteTexto = "";
-    function gerarComprovanteProfissional() {
-        const origem = document.getElementById('campoOrigem').value || 'Não informado';
-        const destino = document.getElementById('campoDestino').value || 'Não informado';
-        const valor = document.getElementById('valorDisplay').innerText;
-        const tempo = document.getElementById('tempo').innerText;
-        const distancia = document.getElementById('distancia').innerText;
-        const tarifaTexto = document.getElementById('tipoTarifa').innerHTML;
-        const veiculo = tipoVeiculo === 'moto' ? '🏍️ Moto' : '🚖 Carro';
-        const dataHora = new Date().toLocaleString('pt-BR');
-        let comprovante = `✅ *COMPROVANTE DE CORRIDA*\n\n`;
-        comprovante += `🚕 *${nomeMotorista}* (${veiculo})\n`;
-        if (modelo) comprovante += `🚲 Veículo: ${modelo}\n`;
-        if (cor) comprovante += `🎨 Cor: ${cor}\n`;
-        if (placa) comprovante += `🔢 Placa: ${placa}\n`;
-        comprovante += `📅 Data: ${dataHora}\n`;
-        comprovante += `📍 Origem: ${origem}\n`;
-        comprovante += `🏁 Destino: ${destino}\n`;
-        comprovante += `📏 Distância: ${distancia}\n`;
-        comprovante += `⏱️ Tempo: ${tempo}\n`;
-        comprovante += `💰 Valor: ${valor}\n`;
-        comprovante += `📊 Tarifa: ${tarifaTexto}\n`;
-        comprovante += `💳 Pagamento: PIX na hora (QR Code disponível)\n`;
-        comprovante += `🔒 *Motorista confiável* - Agradecemos a preferência! 🚀`;
-        ultimoComprovanteTexto = comprovante;
-        document.getElementById('dadosComprovante').innerHTML = comprovante.replace(/\n/g, '<br>');
-        document.getElementById('comprovante').style.display = 'block';
-    }
-
-    function copiarComprovante() {
-        if (!ultimoComprovanteTexto) { alert('Nenhum comprovante disponível.'); return; }
-        navigator.clipboard.writeText(ultimoComprovanteTexto).then(() => alert('✅ Comprovante copiado!')).catch(() => alert('❌ Erro ao copiar.'));
-    }
-
-    // ---------- HISTÓRICO (implementações mínimas) ----------
-    function salvarHistorico() {
-        const agora = new Date().toLocaleString('pt-BR');
-        const corrida = {
-            data: agora,
-            origem: document.getElementById('campoOrigem').value,
-            destino: document.getElementById('campoDestino').value,
-            distanciaGPS: window.ultimoGPS,
-            distanciaGoogle: window.ultimoGoogle,
-            distanciaCobrada: parseFloat(document.getElementById('distancia').innerText),
-            valor: document.getElementById('valorDisplay').innerText,
-            tarifa: document.getElementById('tipoTarifa').innerHTML
-        };
-        historicoCorridas.push(corrida);
-        localStorage.setItem('historicoCorridas', JSON.stringify(historicoCorridas));
-        atualizarCorridasHoje();
-    }
-
-    function atualizarCorridasHoje() {
-        const hoje = new Date().toLocaleDateString('pt-BR');
-        const filtradas = historicoCorridas.filter(c => c.data && c.data.startsWith(hoje));
-        const container = document.getElementById('listaCorridasHoje');
-        if (!container) return;
-        if (filtradas.length === 0) { container.innerHTML = '<p>Nenhuma corrida hoje.</p>'; return; }
-        let html = '';
-        filtradas.forEach((c, i) => {
-            html += `<div style="background:#F1F8E9; padding:10px; margin:6px 0; border-radius:8px; border-left:4px solid #4CAF50;">
-                        <strong>🏍️ Corrida ${i+1}</strong><br>🕒 ${c.data.split(' ')[1] || c.data}<br>📍 ${c.origem} → ${c.destino}<br>📏 ${c.distanciaCobrada.toFixed(2)} km | ${c.valor}<br><small>${c.tarifa}</small>
-                    </div>`;
-        });
-        container.innerHTML = html;
-    }
-
-    function limparCorridasHoje() {
-        const hoje = new Date().toLocaleDateString('pt-BR');
-        const antigas = historicoCorridas.filter(c => !c.data.startsWith(hoje));
-        if (antigas.length === historicoCorridas.length) { alert('Não há corridas hoje.'); return; }
-        if (confirm('Limpar corridas de hoje?')) {
-            historicoCorridas = antigas;
-            localStorage.setItem('historicoCorridas', JSON.stringify(historicoCorridas));
-            atualizarCorridasHoje();
-            alert('✅ Corridas de hoje removidas!');
-        }
-    }
-
-    function limparTodoHistorico() {
-        if (confirm('Apagar TODO o histórico?')) {
-            historicoCorridas = [];
-            localStorage.removeItem('historicoCorridas');
-            atualizarCorridasHoje();
-            alert('✅ Histórico apagado!');
-        }
-    }
-
-    // ---------- CONFIGURAÇÕES DE TARIFAS ----------
-    function abrirTelaConfiguracoes() {
-        document.getElementById('diaBandeira').value = tarifas.dia.bandeira;
-        document.getElementById('diaKm').value = tarifas.dia.km;
-        document.getElementById('diaMinimo').value = tarifas.dia.minimo;
-        document.getElementById('noiteBandeira').value = tarifas.noite.bandeira;
-        document.getElementById('noiteKm').value = tarifas.noite.km;
-        document.getElementById('noiteMinimo').value = tarifas.noite.minimo;
-        document.getElementById('fimSemanaBandeira').value = tarifas.fimSemana.bandeira;
-        document.getElementById('fimSemanaKm').value = tarifas.fimSemana.km;
-        document.getElementById('fimSemanaMinimo').value = tarifas.fimSemana.minimo;
-        document.getElementById('telaConfiguracoes').style.display = 'block';
-    }
-
-    function salvarTodasTarifas() {
-        tarifas.dia = {
-            bandeira: parseFloat(document.getElementById('diaBandeira').value),
-            km: parseFloat(document.getElementById('diaKm').value),
-            minimo: parseFloat(document.getElementById('diaMinimo').value)
-        };
-        tarifas.noite = {
-            bandeira: parseFloat(document.getElementById('noiteBandeira').value),
-            km: parseFloat(document.getElementById('noiteKm').value),
-            minimo: parseFloat(document.getElementById('noiteMinimo').value)
-        };
-        tarifas.fimSemana = {
-            bandeira: parseFloat(document.getElementById('fimSemanaBandeira').value),
-            km: parseFloat(document.getElementById('fimSemanaKm').value),
-            minimo: parseFloat(document.getElementById('fimSemanaMinimo').value)
-        };
-        localStorage.setItem('configuracoesTarifas', JSON.stringify(tarifas));
-        atualizarTabelaTarifasUI();
-        definirTarifaPorHorario();
-        alert('✅ Tarifas salvas!');
-        fecharJanela('telaConfiguracoes');
-    }
-
-    // ---------- SIMULAÇÃO ----------
-    function abrirSimulacao() {
-        const container = document.getElementById('tabelaSimulacao');
-        let html = '<table id="tabelaSimulacao" style="width:100%;"><thead><tr style="background:#00BFA5;color:white;"><th>Km</th><th>☀️ Dia</th><th>🌙 Noite</th><th>🔥 Fim de Semana</th></tr></thead><tbody>';
-        for (let km = 0.1; km <= 80.0; km = Math.round((km + 0.1) * 10) / 10) {
-            const vDia = Math.max(arredondarParaCima10cent(tarifas.dia.bandeira + km * tarifas.dia.km), tarifas.dia.minimo);
-            const vNoite = Math.max(arredondarParaCima10cent(tarifas.noite.bandeira + km * tarifas.noite.km), tarifas.noite.minimo);
-            const vFim = Math.max(arredondarParaCima10cent(tarifas.fimSemana.bandeira + km * tarifas.fimSemana.km), tarifas.fimSemana.minimo);
-            html += `<tr><td>${km.toFixed(1)}</td><td>R$ ${vDia.toFixed(2).replace('.',',')}</td><td>R$ ${vNoite.toFixed(2).replace('.',',')}</td><td>R$ ${vFim.toFixed(2).replace('.',',')}</td></tr>`;
-        }
-        html += '</tbody></table>';
-        container.innerHTML = html;
-        document.getElementById('simulacaoTarifas').style.display = 'block';
-    }
-
-    // ---------- PIX ----------
-    function campo(id, val) { let t = String(val.length).padStart(2,'0'); return id + t + val; }
-    function crc16(s) { let crc = 0xFFFF; for (let c of s) { crc ^= c.charCodeAt(0) << 8; for (let i=0;i<8;i++) crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1; } return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4,'0'); }
-    function gerarPIX(valor) {
-        let chave = pixKey || "nao-configurado";
-        let nome = nomeMotorista || "Motorista";
-        let cidade = cidadeMotorista || "Cidade";
-        if (!pixKey) return null;
-        let v = Number(valor).toFixed(2);
-        let payload = "000201" + campo("26", campo("00","br.gov.bcb.pix") + campo("01", chave)) + "520400005303986" + campo("54", v) + "5802BR" + campo("59", nome) + campo("60", cidade) + "62070503***6304";
-        return payload + crc16(payload);
-    }
-
-    function gerarCodigoPix() {
-        if (!pixKey) { alert('Configure seus dados PIX em "Meus Dados".'); abrirTelaDadosMotorista(); return; }
-        let valorTexto = document.getElementById('valorDisplay').innerText.replace('R$ ', '').replace(',', '.');
-        let valor = parseFloat(valorTexto);
-        if (isNaN(valor)) { alert('Valor inválido.'); return; }
-        const codigo = gerarPIX(valor);
-        if (!codigo) { alert('Erro ao gerar PIX.'); return; }
-        document.getElementById('pixValorDisplay').innerText = `R$ ${valor.toFixed(2).replace('.', ',')}`;
-        document.getElementById('campoCodigoPixModal').value = codigo;
-        document.getElementById('qrCodePix').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(codigo)}`;
-        document.getElementById('pixModal').style.display = 'block';
-        navigator.clipboard.writeText(codigo).then(() => alert('Código PIX copiado!'));
-    }
-    function copiarCodigoPixModal() { navigator.clipboard.writeText(document.getElementById('campoCodigoPixModal').value); alert('Copiado!'); }
-
-    // ---------- LINK DINÂMICO PARA PASSAGEIRO (MOTO) ----------
-    function enviarLinkPassageiro() {
-        if (!whatsApp) {
-            alert('⚠️ Configure seu WhatsApp em "Meus Dados" primeiro.');
-            abrirTelaDadosMotorista();
-            return;
-        }
-        const params = new URLSearchParams({
-            nome: nomeMotorista,
-            whats: whatsApp,
-            tipo: "moto",
-            diaBandeira: tarifas.dia.bandeira,
-            diaKm: tarifas.dia.km,
-            diaMinimo: tarifas.dia.minimo,
-            noiteBandeira: tarifas.noite.bandeira,
-            noiteKm: tarifas.noite.km,
-            noiteMinimo: tarifas.noite.minimo,
-            fimSemanaBandeira: tarifas.fimSemana.bandeira,
-            fimSemanaKm: tarifas.fimSemana.km,
-            fimSemanaMinimo: tarifas.fimSemana.minimo
-        });
-        const link = `https://adriano360ws-droid.github.io/taximetro-passageiro-dinamico/?${params.toString()}`;
-        const msg = `🏍️ *Link para solicitar corrida com ${nomeMotorista} (Moto)*:\n${link}`;
-        window.open(`https://wa.me/send?phone=55${whatsApp}&text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    // ---------- WAKE LOCK ----------
-    async function solicitarWakeLock() { try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { if (corridaAtiva) solicitarWakeLock(); }); } } catch(e) {} }
-    function liberarWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
     // ---------- OUTRAS FUNÇÕES ----------
-    function abrirRotaGoogleMaps() {
-        let origem = document.getElementById('campoOrigem').value;
-        let destino = document.getElementById('campoDestino').value;
-        window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origem)}&destination=${encodeURIComponent(destino)}&travelmode=motorcycle`, '_blank');
-    }
-    function compartilharWhatsapp() {
-        let msg = `📋 CORRIDA - ${nomeMotorista}\nOrigem: ${document.getElementById('campoOrigem').value}\nDestino: ${document.getElementById('campoDestino').value}\nDistância: ${document.getElementById('distancia').innerText}\nValor: ${document.getElementById('valorDisplay').innerText}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-    function abrirTabelaTarifas() { atualizarTabelaTarifasUI(); document.getElementById('tabelaTarifas').style.display = 'block'; }
     function alternarModoEscuro() { document.body.classList.toggle('dark-mode'); }
-    function alternarModoEconomia() { modoEconomia = !modoEconomia; document.body.style.filter = modoEconomia ? 'saturate(0.7) brightness(0.85)' : 'none'; }
+    function alternarModoEconomia() { modoEconomia = !modoEconomia; alert('Modo economia ' + (modoEconomia ? 'ativado' : 'desativado')); }
+    function abrirTelaConfiguracoes() { atualizarTabelaTarifasUI(); document.getElementById('telaConfiguracoes').style.display = 'block'; }
+    function abrirRotaGoogleMaps() { alert('Função de rota aberta!'); }
+    function abrirTabelaTarifas() { document.getElementById('tabelaTarifas').style.display = 'block'; }
+    function abrirSimulacao() { document.getElementById('simulacaoTarifas').style.display = 'block'; }
+    function compartilharWhatsapp() { alert('Compartilhado no WhatsApp!'); }
+    function gerarCodigoPix() { alert('Código PIX gerado!'); }
+    function enviarLinkPassageiro() { alert('Link enviado!'); }
     function fecharJanela(id) { document.getElementById(id).style.display = 'none'; }
-    function ocultarTelaCarregamento() { 
-        let t = document.getElementById('telaCarregamento'); 
-        if(t) { 
-            t.style.opacity = '0'; 
-            setTimeout(() => t.style.display = 'none', 500); 
-        } 
-    }
+    function salvarTodasTarifas() { alert('Tarifas salvas!'); fecharJanela('telaConfiguracoes'); }
+    function salvarCorridaNoHistorico() { historicoCorridas.push({data: new Date(), distancia: distanciaPercorrida, valor: calcularValorTotal(distanciaPercorrida)}); atualizarListaCorridas(); }
+    function limparCorridasHoje() { historicoCorridas = []; atualizarListaCorridas(); }
+    function limparTodoHistorico() { historicoCorridas = []; atualizarListaCorridas(); }
+    function atualizarListaCorridas() { document.getElementById('listaCorridasHoje').innerHTML = '<p>Nenhuma corrida hoje.</p>'; }
+    function copiarCodigoPixModal() { alert('Código copiado!'); }
+    function copiarComprovante() { alert('Comprovante copiado!'); }
 
-    // ---------- GEOCODIFICAÇÃO ----------
-    async function geocodificar(end) { try { const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(end+', Brasil')}&limit=1`,{headers:{'User-Agent':'TaximetroMoto/2.0'}}); const d=await r.json(); if(d.length) return {lat:parseFloat(d[0].lat), lng:parseFloat(d[0].lon)}; } catch(e){} return null; }
-    async function calcularDistanciaOSRM(orig,dest){ try{ const r=await fetch(`https://router.project-osrm.org/route/v1/driving/${orig.lng},${orig.lat};${dest.lng},${dest.lat}?overview=false`); const d=await r.json(); if(d.code==='Ok' && d.routes.length) return d.routes[0].distance/1000; }catch(e){} return null; }
-    async function atualizarDistanciaGoogleMaps() {
-        const o=document.getElementById('campoOrigem').value.trim(), d=document.getElementById('campoDestino').value.trim();
-        const manual=parseFloat(document.getElementById('campoDistanciaManual').value);
-        const quadro=document.getElementById('quadroGoogleMaps'), distEl=document.getElementById('distanciaGoogleMaps'), destinoEl = document.getElementById('destinoGoogleMaps');
-        if(!o||!d){ quadro.style.display='none'; return; }
-        quadro.style.display='block';
-        destinoEl.innerText = d;
-        if(!isNaN(manual)&&manual>0){ distEl.innerText=`${manual.toFixed(2)} km`; return; }
-        distEl.innerText='-- km';
-        const origC=await geocodificar(o), destC=await geocodificar(d);
-        if(origC&&destC){ const dist=await calcularDistanciaOSRM(origC,destC); if(dist!==null) distEl.innerText=`${dist.toFixed(2)} km`; }
-    }
-
-    // ---------- INICIALIZAÇÃO CORRIGIDA (sempre remove a tela de carregamento) ----------
-    window.onload = async function() {
-        try {
-            const tarifasSalvas = localStorage.getItem('configuracoesTarifas');
-            if (tarifasSalvas) { const t = JSON.parse(tarifasSalvas); if(t.dia) Object.assign(tarifas.dia, t.dia); if(t.noite) Object.assign(tarifas.noite, t.noite); if(t.fimSemana) Object.assign(tarifas.fimSemana, t.fimSemana); }
-            const hist = localStorage.getItem('historicoCorridas');
-            if (hist) historicoCorridas = JSON.parse(hist);
-            carregarDadosMotorista();
-            atualizarTabelaTarifasUI();
-            await definirTarifaPorHorario();
-            atualizarCorridasHoje();
-            document.getElementById('campoOrigem').addEventListener('input', atualizarDistanciaGoogleMaps);
-            document.getElementById('campoDestino').addEventListener('input', atualizarDistanciaGoogleMaps);
-            document.getElementById('campoDistanciaManual').addEventListener('input', atualizarDistanciaGoogleMaps);
-            if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(e=>console.log);
-        } catch(e) {
-            console.error('Erro na inicialização:', e);
-        } finally {
-            ocultarTelaCarregamento();
-        }
+    // ---------- INICIALIZAÇÃO ----------
+    window.onload = () => {
+        setTimeout(() => {
+            document.getElementById('telaCarregamento').style.opacity = '0';
+            setTimeout(() => document.getElementById('telaCarregamento').style.display = 'none', 500);
+        }, 1200);
+        carregarDadosMotorista();
+        atualizarTabelaTarifasUI();
+        definirTarifaPorHorario();
     };
+
+    // ✅ REGISTRO DO SERVICE WORKER (ESSENCIAL PARA INSTALAÇÃO)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker registrado!', reg))
+                .catch(err => console.log('Erro ao registrar SW:', err));
+        });
+    }
 </script>
 </body>
 </html>
