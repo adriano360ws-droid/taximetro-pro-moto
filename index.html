@@ -266,6 +266,9 @@
         setText('tabFimBandeira', tarifas.fimSemana.bandeira);
         setText('tabFimKm', tarifas.fimSemana.km);
         setText('tabFimMinimo', tarifas.fimSemana.minimo);
+        
+        // ✅ SEMPRE ATUALIZA A SIMULAÇÃO QUANDO MUDA TARIFA
+        gerarTabelaSimulacao();
     }
 
     // ---------- FERIADOS ----------
@@ -387,31 +390,44 @@
         salvarCorridaNoHistorico();
     }
 
-    // ✅ FUNÇÃO DE SIMULAÇÃO CORRIGIDA E COMPLETA
+    // ✅ SIMULAÇÃO GARANTIDA - GERA TODOS OS VALORES
     function gerarTabelaSimulacao() {
         const container = document.getElementById('tabelaSimulacao');
-        let html = '<table id="tabelaSimulacao"><thead><tr><th>Distância</th><th>☀️ Dia</th><th>🌙 Noite</th><th>🔥 Fim Semana</th></tr></thead><tbody>';
+        if (!container) return;
+
+        let html = `
+        <table id="tabelaSimulacao">
+            <thead>
+                <tr style="background:#0A5CBF; color:white;">
+                    <th>Distância</th>
+                    <th>☀️ Tarifa Dia</th>
+                    <th>🌙 Tarifa Noite</th>
+                    <th>🔥 Fim Semana/Feriado</th>
+                </tr>
+            </thead>
+            <tbody>`;
         
-        // Gera de 0.1km até 80km, de 0.5 em 0.5km
-        for (let km = 0.1; km <= 80; km += 0.5) {
+        // De 0.1km até 80km, de 0.5 em 0.5km
+        for (let km = 0.1; km <= 80.1; km += 0.5) {
             const valDia = calcularValorTotal(km, tarifas.dia);
             const valNoite = calcularValorTotal(km, tarifas.noite);
             const valFim = calcularValorTotal(km, tarifas.fimSemana);
             
             html += `
             <tr>
-                <td>${km.toFixed(1)} km</td>
+                <td><strong>${km.toFixed(1)} km</strong></td>
                 <td>R$ ${valDia.toFixed(2).replace('.', ',')}</td>
                 <td>R$ ${valNoite.toFixed(2).replace('.', ',')}</td>
                 <td>R$ ${valFim.toFixed(2).replace('.', ',')}</td>
             </tr>`;
         }
-        html += '</tbody></table>';
+
+        html += `</tbody></table>`;
         container.innerHTML = html;
     }
 
     function abrirSimulacao() {
-        gerarTabelaSimulacao(); // ✅ Agora gera os dados antes de abrir
+        gerarTabelaSimulacao(); // ✅ Recalcula tudo na hora
         document.getElementById('simulacaoTarifas').style.display = 'block';
     }
 
@@ -425,20 +441,25 @@
     function gerarCodigoPix() { alert('Código PIX gerado!'); }
     function enviarLinkPassageiro() { alert('Link enviado!'); }
     function fecharJanela(id) { document.getElementById(id).style.display = 'none'; }
+    
     function salvarTodasTarifas() { 
-        tarifas.dia.bandeira = parseFloat(document.getElementById('diaBandeira').value);
-        tarifas.dia.km = parseFloat(document.getElementById('diaKm').value);
-        tarifas.dia.minimo = parseFloat(document.getElementById('diaMinimo').value);
-        tarifas.noite.bandeira = parseFloat(document.getElementById('noiteBandeira').value);
-        tarifas.noite.km = parseFloat(document.getElementById('noiteKm').value);
-        tarifas.noite.minimo = parseFloat(document.getElementById('noiteMinimo').value);
-        tarifas.fimSemana.bandeira = parseFloat(document.getElementById('fimSemanaBandeira').value);
-        tarifas.fimSemana.km = parseFloat(document.getElementById('fimSemanaKm').value);
-        tarifas.fimSemana.minimo = parseFloat(document.getElementById('fimSemanaMinimo').value);
+        tarifas.dia.bandeira = parseFloat(document.getElementById('diaBandeira').value) || 0;
+        tarifas.dia.km = parseFloat(document.getElementById('diaKm').value) || 0;
+        tarifas.dia.minimo = parseFloat(document.getElementById('diaMinimo').value) || 0;
+        
+        tarifas.noite.bandeira = parseFloat(document.getElementById('noiteBandeira').value) || 0;
+        tarifas.noite.km = parseFloat(document.getElementById('noiteKm').value) || 0;
+        tarifas.noite.minimo = parseFloat(document.getElementById('noiteMinimo').value) || 0;
+        
+        tarifas.fimSemana.bandeira = parseFloat(document.getElementById('fimSemanaBandeira').value) || 0;
+        tarifas.fimSemana.km = parseFloat(document.getElementById('fimSemanaKm').value) || 0;
+        tarifas.fimSemana.minimo = parseFloat(document.getElementById('fimSemanaMinimo').value) || 0;
+        
         atualizarTabelaTarifasUI();
-        alert('✅ Tarifas salvas!'); 
+        alert('✅ Tarifas salvas e simulação atualizada!'); 
         fecharJanela('telaConfiguracoes'); 
     }
+    
     function salvarCorridaNoHistorico() { historicoCorridas.push({data: new Date(), distancia: distanciaPercorrida, valor: calcularValorTotal(distanciaPercorrida)}); atualizarListaCorridas(); }
     function limparCorridasHoje() { historicoCorridas = []; atualizarListaCorridas(); }
     function limparTodoHistorico() { historicoCorridas = []; atualizarListaCorridas(); }
@@ -455,6 +476,9 @@
         carregarDadosMotorista();
         atualizarTabelaTarifasUI();
         definirTarifaPorHorario();
+        
+        // ✅ GERA A TABELA DE SIMULAÇÃO ASSIM QUE A PÁGINA CARREGA
+        gerarTabelaSimulacao();
     };
 
     // ✅ REGISTRO DO SERVICE WORKER (ESSENCIAL PARA INSTALAÇÃO)
