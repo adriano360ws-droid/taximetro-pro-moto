@@ -8,9 +8,9 @@
     <meta name="apple-mobile-web-app-title" content="Taxímetro Moto">
     <meta name="theme-color" content="#0A5CBF">
     <title>Taxímetro Pro - Moto</title>
-    <!-- ✅ Arquivo obrigatório para PWA -->
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="icone.png">
+    <!-- ✅ CAMINHO CERTO DO MANIFESTO -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/png" href="./icone.png">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', Arial, sans-serif; transition: background 0.3s, color 0.3s; }
         body { background: #E3F2FD; text-align: center; padding: 15px; }
@@ -470,12 +470,12 @@
         gerarTabelaSimulacao();
     };
 
-    // ✅ REGISTRO OBRIGATÓRIO DO SERVICE WORKER PARA INSTALAR
+    // ✅ REGISTRO CERTO DO SERVICE WORKER
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('✅ Service Worker registrado! PWA pronto para instalar', reg))
-                .catch(err => console.log('❌ Erro ao registrar SW:', err));
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('✅ PWA PRONTO PARA INSTALAR!', reg))
+                .catch(err => console.log('❌ ERRO:', err));
         });
     }
 </script>
