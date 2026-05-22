@@ -1,9 +1,10 @@
-const CACHE_NAME = 'taximetro-app-v2';
+const CACHE_NAME = 'taximetro-app-v3';
 const ARQUIVOS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icone.png'
+  '/taximetro-pro-moto/',
+  '/taximetro-pro-moto/index.html',
+  '/taximetro-pro-moto/manifest.json',
+  '/taximetro-pro-moto/icone-192.png',
+  '/taximetro-pro-moto/icone-512.png'
 ];
 
 self.addEventListener('install', (e) => {
