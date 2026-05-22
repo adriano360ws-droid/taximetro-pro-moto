@@ -1,4 +1,4 @@
-const CACHE_NAME = 'taximetro-v5';
+const CACHE_NAME = 'taximetro-final-v1';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
