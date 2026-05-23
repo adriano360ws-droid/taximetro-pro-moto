@@ -435,7 +435,7 @@
 
         // Se o usuário digitou uma distância manual, exibe com 3 casas decimais
         if (!isNaN(manual) && manual > 0) {
-            distEl.innerText = `${manual.toFixed(3)} km`;
+            distEl.innerText = `${manual.toFixed(2)} km`;
             window.googleMapsDist = manual;
             return;
         }
