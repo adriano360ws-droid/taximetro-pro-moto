@@ -1,13 +1,14 @@
 
 
-const CACHE_NAME = "taximetro-v2";
+
+const CACHE_NAME = "taximetro-pro-v3";
 
 const urlsToCache = [
-  "/taximetro-pro-moto/",
-  "/taximetro-pro-moto/index.html",
-  "/taximetro-pro-moto/manifest.json",
-  "/taximetro-pro-moto/icone-192.png",
-  "/taximetro-pro-moto/icone-512.png"
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./icone-192.png",
+  "./icone-512.png"
 ];
 
 self.addEventListener("install", event => {
@@ -20,8 +21,6 @@ self.addEventListener("install", event => {
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request)
-      .then(response => {
-        return response || fetch(event.request);
-      })
+      .then(response => response || fetch(event.request))
   );
 });
