@@ -1,6 +1,6 @@
 
 
-const CACHE_NAME = "taximetro-moto-v1";
+const CACHE_NAME = "taximetro-v2";
 
 const urlsToCache = [
   "/taximetro-pro-moto/",
