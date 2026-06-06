@@ -696,31 +696,32 @@
         alert('Copiado!');
     }
 
-    // ---------- LINK DINÂMICO PARA PASSAGEIRO ----------
-    function enviarLinkPassageiro() {
-        if (!whatsApp) {
-            alert('⚠️ Configure seu WhatsApp em "Meus Dados".');
-            abrirTelaDadosMotorista();
-            return;
-        }
-        const params = new URLSearchParams({
-            nome: nomeMotorista,
-            whats: whatsApp,
-            tipo: "moto",
-            diaBandeira: tarifas.dia.bandeira,
-            diaKm: tarifas.dia.km,
-            diaMinimo: tarifas.dia.minimo,
-            noiteBandeira: tarifas.noite.bandeira,
-            noiteKm: tarifas.noite.km,
-            noiteMinimo: tarifas.noite.minimo,
-            fimSemanaBandeira: tarifas.fimSemana.bandeira,
-            fimSemanaKm: tarifas.fimSemana.km,
-            fimSemanaMinimo: tarifas.fimSemana.minimo
-        });
-        const link = `https://adriano360ws-droid.github.io/taximetro-passageiro-dinamico/?${params.toString()}`;
-        const msg = `🏍️ *Link para solicitar corrida com ${nomeMotorista} (Moto)*:\n${link}`;
-        window.open(`https://wa.me/send?phone=55${whatsApp}&text=${encodeURIComponent(msg)}`, '_blank');
+    /// ---------- LINK DINÂMICO PARA PASSAGEIRO ----------
+function enviarLinkPassageiro() {
+    console.log('WhatsApp salvo:', whatsApp);  // <-- LINHA DE DEPURAÇÃO
+    if (!whatsApp) {
+        alert('⚠️ Configure seu WhatsApp em "Meus Dados".');
+        abrirTelaDadosMotorista();
+        return;
     }
+    const params = new URLSearchParams({
+        nome: nomeMotorista,
+        whats: whatsApp,
+        tipo: "moto",
+        diaBandeira: tarifas.dia.bandeira,
+        diaKm: tarifas.dia.km,
+        diaMinimo: tarifas.dia.minimo,
+        noiteBandeira: tarifas.noite.bandeira,
+        noiteKm: tarifas.noite.km,
+        noiteMinimo: tarifas.noite.minimo,
+        fimSemanaBandeira: tarifas.fimSemana.bandeira,
+        fimSemanaKm: tarifas.fimSemana.km,
+        fimSemanaMinimo: tarifas.fimSemana.minimo
+    });
+    const link = `https://adriano360ws-droid.github.io/taximetro-passageiro-dinamico/?${params.toString()}`;
+    const msg = `🏍️ *Link para solicitar corrida com ${nomeMotorista} (Moto)*:\n${link}`;
+    window.open(`https://wa.me/send?phone=55${whatsApp}&text=${encodeURIComponent(msg)}`, '_blank');
+}
 
     // ---------- OUTRAS FUNÇÕES ----------
     function abrirRotaGoogleMaps() {
