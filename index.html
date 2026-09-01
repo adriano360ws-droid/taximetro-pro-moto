@@ -128,8 +128,7 @@
 <div id="pixModal" class="modal">
     <h3>💳 PAGAMENTO PIX</h3>
     <p style="text-align:center; font-size:1.2em;">Valor: <span id="pixValorDisplay">R$ 0,00</span></p>
-    <div class="qr-container"><img id="qrCodePix" src="" alt="QR Code Pix"></div>
-    <textarea id="campoCodigoPixModal" readonly style="height:80px;"></textarea>
+    <textarea id="campoCodigoPixModal" readonly style="height:80px; width:100%;"></textarea>
     <button class="btn-pix" onclick="copiarCodigoPixModal()">📋 COPIAR CÓDIGO PIX</button>
     <button class="fechar-btn" onclick="fecharModal('pixModal')">❌ Fechar</button>
 </div>
@@ -567,7 +566,11 @@ function gerarCodigoPix() {
     const valorFinal = Math.min(valorMaps, valorTax);
     const elPixValor = document.getElementById('pixValorDisplay');
     if (elPixValor) elPixValor.innerText = formatarValor(valorFinal);
-    alert('Valor a cobrar: ' + formatarValor(valorFinal) + '\nConfigure a geração de código Pix completa.');
+    alert('Valor a cobrar: ' + formatarValor(valorFinal) + '\nCopie sua chave Pix no campo acima e compartilhe!');
+}
+
+function copiarCodigoPixModal() {
+    alert('Copie sua chave Pix diretamente no campo "Meus Dados"!');
 }
 
 function alternarModoEscuro() {
@@ -596,7 +599,6 @@ window.onload = function() {
     definirTarifaPorHorario();
     atualizarListaCorridas();
 
-    // Carregamento mais rápido
     setTimeout(() => {
         const tela = document.getElementById('telaCarregamento');
         const conteudo = document.getElementById('conteudoPrincipal');
