@@ -179,7 +179,7 @@
     </div>
 
     <div id="simulacaoTarifas">
-        <h3>📈 SIMULAÇÃO DE PREÇOS (0,1 a 80,0 km)</h3>
+        <h3>📈 SIMULAÇÃO DE PREÇOS (0,5 a 80,0 km)</h3>
         <div id="tabelaSimulacao"></div>
         <button class="fechar-btn" onclick="fecharJanela('simulacaoTarifas')">❌ Fechar</button>
     </div>
@@ -388,6 +388,22 @@
         }
     }
 
+    function abrirTelaConfiguracoes() {
+        document.getElementById('diaBandeira').value = tarifas.dia.bandeira;
+        document.getElementById('diaKm').value = tarifas.dia.km;
+        document.getElementById('diaMinimo').value = tarifas.dia.minimo;
+        document.getElementById('noiteBandeira').value = tarifas.noite.bandeira;
+        document.getElementById('noiteKm').value = tarifas.noite.km;
+        document.getElementById('noiteMinimo').value = tarifas.noite.minimo;
+        document.getElementById('fimSemanaBandeira').value = tarifas.fimSemana.bandeira;
+        document.getElementById('fimSemanaKm').value = tarifas.fimSemana.km;
+        document.getElementById('fimSemanaMinimo').value = tarifas.fimSemana.minimo;
+        document.getElementById('interBandeira').value = tarifas.intermunicipal.bandeira;
+        document.getElementById('interKm').value = tarifas.intermunicipal.km;
+        document.getElementById('interMinimo').value = tarifas.intermunicipal.minimo;
+        document.getElementById('telaConfiguracoes').style.display = 'block';
+    }
+
     function calcularValorTotal(distancia, tarifa = tarifaAtual) {
         let valor = tarifa.bandeira + (distancia * tarifa.km);
         return valor < tarifa.minimo ? tarifa.minimo : valor;
@@ -419,7 +435,6 @@
     async function iniciar() {
         if (corridaAtiva) return;
 
-        // Se estiver no modo intermunicipal, usa o km digitado
         if (intermunicipalAtivo) {
             const kmInter = parseFloat(document.getElementById('kmIntermunicipal').value);
             if (!isNaN(kmInter) && kmInter > 0) {
@@ -597,7 +612,7 @@ Obrigado pela preferência!
     function abrirSimulacao() {
         const container = document.getElementById('tabelaSimulacao');
         let html = '<table style="width:100%; border-collapse:collapse;"><thead style="background:#00B050; color:white;"><tr><th>Km</th><th>☀️ Dia</th><th>🌙 Noite</th><th>🔥 Fim Semana</th><th>🚛 Inter</th></tr></thead><tbody>';
-        for (let km = 0.5; km <= 50; km += 0.5) {
+        for (let km = 0.5; km <= 80; km += 0.5) {
             html += `<tr><td>${km.toFixed(1)}</td>
                 <td>R$ ${calcularValorTotal(km, tarifas.dia).toFixed(2).replace('.', ',')}</td>
                 <td>R$ ${calcularValorTotal(km, tarifas.noite).toFixed(2).replace('.', ',')}</td>
@@ -754,13 +769,4 @@ Obrigado pela preferência!
             if (t.intermunicipal) Object.assign(tarifas.intermunicipal, t.intermunicipal);
         }
         const histSalvo = localStorage.getItem('historicoCorridas');
-        if (histSalvo) historicoCorridas = JSON.parse(histSalvo);
-        carregarDadosMotorista();
-        atualizarTabelaTarifasUI();
-        definirTarifaPorHorario();
-        atualizarListaCorridas();
-        ocultarTelaCarregamento();
-    };
-</script>
-</body>
-</html>
+        if (histSal
