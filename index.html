@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+            <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -28,7 +29,7 @@
         #tipoTarifa.noturno { background: #EDE7F6; color: #512DA8; border-color: #9575CD; }
         button { padding: 14px; margin: 6px 4px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; background: #00B050; color: white; width: calc(50% - 10px); font-size: 16px; }
         .btn-parar { background: #EF5350; }
-        .btn-tabela, .btn-whatsapp, .btn-pix, .btn-rota, .btn-link, .btn-intermunicipal { width: 100%; margin-top: 8px; }
+        .btn-tabela, .btn-whatsapp, .btn-pix, .btn-rota, .btn-intermunicipal { width: 100%; margin-top: 8px; }
         .btn-intermunicipal { background: #2196F3; padding: 14px; border-radius: 12px; font-weight: bold; color: white; cursor: pointer; font-size: 16px; }
         .btn-intermunicipal.ativo { background: #1565C0; }
         input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid #ccc; background: #FFF; font-size: 16px; }
@@ -38,7 +39,7 @@
         .aviso-privacidade { background: #E8EAF6; color: #1A237E; padding: 8px; border-radius: 8px; font-size: 0.75em; text-align: center; margin-top: 10px; }
         .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000; width: 90%; max-width: 420px; max-height: 90vh; overflow-y: auto; }
         .modal-fundo { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
-        .tela-carregamento { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #00B050, #00897B); display: flex; align-items: center; justify-content: center; color: white; z-index: 2000; transition: opacity 0.5s; flex-direction: column; gap: 15px; font-size: 1.2em; }
+        .tela-carregamento { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #00B050, #00897B); display: flex; align-items: center; justify-content: center; color: white; z-index: 2000; transition: opacity 0.3s; flex-direction: column; gap: 15px; font-size: 1.2em; }
         .btn-limpar-hoje { background: #D32F2F; font-size: 0.8em; padding: 8px; width: auto; margin-left: 4px; }
         h3 { margin-bottom: 15px; color: #333; text-align: center; }
         h4 { margin: 15px 0 8px; color: #555; }
@@ -49,12 +50,9 @@
         th { background: #f0f0f0; }
         body.dark-mode th, body.dark-mode td { border-color: #444; }
         body.dark-mode th { background: #333; }
-        .qr-container { width: 200px; height: 200px; margin: 15px auto; background: #fff; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-        .qr-container img { width: 100%; height: 100%; }
         .corrida-item { border-bottom: 1px solid #ddd; padding: 8px 0; font-size: 0.9em; }
         .grupo-tarifa { border-left: 3px solid #ccc; padding-left: 12px; margin: 15px 0; }
         .grupo-tarifa.inter { border-left-color: #2196F3; }
-        .menor-valor { color: #2E7D32; font-weight: bold; }
         .dados-rota { font-size: 0.9em; color: #555; margin: 5px 0; }
         @media(max-width:380px) { .valor-final { font-size: 2.2em; } }
     </style>
@@ -72,7 +70,7 @@
     <div class="botoes-ajustes">
         <button class="btn-ajuste" onclick="alternarModoEscuro()">🌙 Modo Escuro</button>
         <button class="btn-ajuste" onclick="abrirModal('telaConfiguracoes')">⚙️ Tarifas</button>
-        <button class="btn-ajuste" onclick="abrirModal('telaDadosMotorista')()">👤 Meus Dados</button>
+        <button class="btn-ajuste" onclick="abrirModal('telaDadosMotorista')">👤 Meus Dados</button>
     </div>
 
     <button class="btn-intermunicipal" id="btnIntermunicipal" onclick="alternarIntermunicipal()">🚛 Intermunicipal: Desativado</button>
@@ -112,7 +110,7 @@
     </div>
 
     <button class="btn-rota" onclick="abrirRotaGoogleMaps()">🗺️ ABRIR ROTA NO MAPS</button>
-    <button class="btn-tabela" onclick="abrirModal('tabelaTarifas')()">📊 TABELA DE TARIFAS</button>
+    <button class="btn-tabela" onclick="abrirModal('tabelaTarifas')">📊 TABELA DE TARIFAS</button>
     <button class="btn-whatsapp" onclick="compartilharWhatsapp()">💬 ENVIAR POR WHATSAPP</button>
     <button class="btn-pix" id="btnPix" onclick="gerarCodigoPix()" disabled>💳 GERAR PIX</button>
 
@@ -202,7 +200,6 @@
 </div>
 
 <script>
-// ESTRUTURA DE TARIFAS
 const tarifas = {
     dia: { bandeira: 3.00, km: 1.30, minimo: 0.00 },
     noite: { bandeira: 3.50, km: 1.45, minimo: 0.00 },
@@ -223,7 +220,6 @@ let intermunicipalAtivo = false;
 let pixKey = "", nomeMotorista = "", cidadeMotorista = "", whatsApp = "";
 let historicoCorridas = [];
 
-// --- MODAIS ---
 function abrirModal(id) {
     document.getElementById(id).style.display = 'block';
     document.getElementById('fundoModal').style.display = 'block';
@@ -239,24 +235,29 @@ function fecharTodosModais() {
     document.getElementById('fundoModal').style.display = 'none';
 }
 
-// --- DADOS MOTORISTA ---
 function carregarDadosMotorista() {
     pixKey = localStorage.getItem('pixKey') || "";
     nomeMotorista = localStorage.getItem('nomeMotorista') || "Motorista";
     cidadeMotorista = localStorage.getItem('cidadeMotorista') || "";
     whatsApp = localStorage.getItem('whatsApp') || "";
-    if (document.getElementById('inputPixKey')) {
-        document.getElementById('inputPixKey').value = pixKey;
-        document.getElementById('inputNomeMotorista').value = nomeMotorista;
-        document.getElementById('inputCidadeMotorista').value = cidadeMotorista;
-        document.getElementById('inputWhatsApp').value = whatsApp;
-    }
+    const elPix = document.getElementById('inputPixKey');
+    const elNome = document.getElementById('inputNomeMotorista');
+    const elCidade = document.getElementById('inputCidadeMotorista');
+    const elWhats = document.getElementById('inputWhatsApp');
+    if (elPix) elPix.value = pixKey;
+    if (elNome) elNome.value = nomeMotorista;
+    if (elCidade) elCidade.value = cidadeMotorista;
+    if (elWhats) elWhats.value = whatsApp;
 }
 function salvarDadosMotorista() {
-    localStorage.setItem('pixKey', document.getElementById('inputPixKey').value.trim());
-    localStorage.setItem('nomeMotorista', document.getElementById('inputNomeMotorista').value.trim());
-    localStorage.setItem('cidadeMotorista', document.getElementById('inputCidadeMotorista').value.trim());
-    localStorage.setItem('whatsApp', document.getElementById('inputWhatsApp').value.trim().replace(/\D/g, ''));
+    const elPix = document.getElementById('inputPixKey');
+    const elNome = document.getElementById('inputNomeMotorista');
+    const elCidade = document.getElementById('inputCidadeMotorista');
+    const elWhats = document.getElementById('inputWhatsApp');
+    localStorage.setItem('pixKey', elPix ? elPix.value.trim() : '');
+    localStorage.setItem('nomeMotorista', elNome ? elNome.value.trim() : '');
+    localStorage.setItem('cidadeMotorista', elCidade ? elCidade.value.trim() : '');
+    localStorage.setItem('whatsApp', elWhats ? elWhats.value.trim().replace(/\D/g, '') : '');
     carregarDadosMotorista();
     alert('✅ Dados salvos!');
     fecharModal('telaDadosMotorista');
@@ -269,7 +270,6 @@ function limparDadosMotorista() {
     }
 }
 
-// --- INTERMUNICIPAL ---
 function alternarIntermunicipal() {
     intermunicipalAtivo = !intermunicipalAtivo;
     const btn = document.getElementById('btnIntermunicipal');
@@ -284,55 +284,45 @@ function alternarIntermunicipal() {
     atualizarValorMaps();
 }
 
-// --- HORÁRIO E TARIFA ---
 function definirTarifaPorHorario() {
     const agora = new Date();
-    const diaSemana = agora.getDay(); // 0=dom, 6=sáb
+    const diaSemana = agora.getDay();
     const hora = agora.getHours();
     const tipoTarifaEl = document.getElementById('tipoTarifa');
-    tipoTarifaEl.classList.remove('intermunicipal', 'noturno');
+    if (tipoTarifaEl) tipoTarifaEl.classList.remove('intermunicipal', 'noturno');
 
-    // Fim de semana = sábado (6) ou domingo (0)
     const ehFimDeSemana = (diaSemana === 0 || diaSemana === 6);
-    // Dia = 06:00 até 17:59 | Noite = 18:00 até 05:59
     const ehDia = (hora >= 6 && hora < 18);
 
     if (intermunicipalAtivo) {
         if (ehDia) {
             tarifaAtual = tarifas.interDia;
-            tipoTarifaEl.innerHTML = '☀️🚛 Intermunicipal — Dia';
-            tipoTarifaEl.classList.add('intermunicipal');
+            if (tipoTarifaEl) { tipoTarifaEl.innerHTML = '☀️🚛 Intermunicipal — Dia'; tipoTarifaEl.classList.add('intermunicipal'); }
         } else {
             tarifaAtual = tarifas.interNoite;
-            tipoTarifaEl.innerHTML = '🌙🚛 Intermunicipal — Noite';
-            tipoTarifaEl.classList.add('intermunicipal', 'noturno');
+            if (tipoTarifaEl) { tipoTarifaEl.innerHTML = '🌙🚛 Intermunicipal — Noite'; tipoTarifaEl.classList.add('intermunicipal', 'noturno'); }
         }
     } else if (ehFimDeSemana) {
         if (ehDia) {
             tarifaAtual = tarifas.fimSemana;
-            tipoTarifaEl.innerHTML = '🔥 Fim de Semana — Dia';
+            if (tipoTarifaEl) tipoTarifaEl.innerHTML = '🔥 Fim de Semana — Dia';
         } else {
             tarifaAtual = tarifas.noite;
-            tipoTarifaEl.innerHTML = '🌙🔥 Fim de Semana — Noite';
-            tipoTarifaEl.classList.add('noturno');
+            if (tipoTarifaEl) { tipoTarifaEl.innerHTML = '🌙🔥 Fim de Semana — Noite'; tipoTarifaEl.classList.add('noturno'); }
         }
     } else if (ehDia) {
         tarifaAtual = tarifas.dia;
-        tipoTarifaEl.innerHTML = '☀️ Tarifa de Dia';
+        if (tipoTarifaEl) tipoTarifaEl.innerHTML = '☀️ Tarifa de Dia';
     } else {
         tarifaAtual = tarifas.noite;
-        tipoTarifaEl.innerHTML = '🌙 Tarifa de Noite';
-        tipoTarifaEl.classList.add('noturno');
+        if (tipoTarifaEl) { tipoTarifaEl.innerHTML = '🌙 Tarifa de Noite'; tipoTarifaEl.classList.add('noturno'); }
     }
-
     atualizarValorMaps();
     if (corridaAtiva) atualizarValorTaximetro();
 }
 
-// Atualiza tarifa a cada minuto automaticamente
 setInterval(definirTarifaPorHorario, 60000);
 
-// --- CÁLCULOS ---
 function calcularValor(distancia, tarifa) {
     let valor = tarifa.bandeira + (distancia * tarifa.km);
     return tarifa.minimo > 0 && valor < tarifa.minimo ? tarifa.minimo : valor;
@@ -342,23 +332,30 @@ function formatarValor(valor) {
     return 'R$ ' + valor.toFixed(2).replace('.', ',');
 }
 
-// --- VALOR DO GOOGLE MAPS (estimado) ---
 function atualizarValorMaps() {
-    const origem = document.getElementById('campoOrigem').value || '-';
-    const destino = document.getElementById('campoDestino').value || '-';
-    kmGoogleMaps = parseFloat(document.getElementById('kmGoogleMaps').value) || 0;
-    document.getElementById('exibeOrigem').innerText = origem;
-    document.getElementById('exibeDestino').innerText = destino;
-    document.getElementById('kmMaps').innerText = kmGoogleMaps.toFixed(2).replace('.', ',');
-    const valorMaps = calcularValor(kmGoogleMaps, tarifaAtual);
-    document.getElementById('valorMaps').innerText = formatarValor(valorMaps);
+    const elOrigem = document.getElementById('campoOrigem');
+    const elDestino = document.getElementById('campoDestino');
+    const elKmInput = document.getElementById('kmGoogleMaps');
+    const elExibeOrigem = document.getElementById('exibeOrigem');
+    const elExibeDestino = document.getElementById('exibeDestino');
+    const elKmMaps = document.getElementById('kmMaps');
+    const elValorMaps = document.getElementById('valorMaps');
+
+    const origem = elOrigem ? elOrigem.value || '-' : '-';
+    const destino = elDestino ? elDestino.value || '-' : '-';
+    kmGoogleMaps = elKmInput ? parseFloat(elKmInput.value) || 0 : 0;
+
+    if (elExibeOrigem) elExibeOrigem.innerText = origem;
+    if (elExibeDestino) elExibeDestino.innerText = destino;
+    if (elKmMaps) elKmMaps.innerText = kmGoogleMaps.toFixed(2).replace('.', ',');
+    if (elValorMaps) elValorMaps.innerText = formatarValor(calcularValor(kmGoogleMaps, tarifaAtual));
 }
 
-// --- VALOR DO TAXÍMETRO GPS (tempo real) ---
 function atualizarValorTaximetro() {
-    document.getElementById('kmTaximetro').innerText = distanciaPercorrida.toFixed(2).replace('.', ',') + ' km';
-    const valorTax = calcularValor(distanciaPercorrida, tarifaAtual);
-    document.getElementById('valorTaximetro').innerText = formatarValor(valorTax);
+    const elKmTax = document.getElementById('kmTaximetro');
+    const elValorTax = document.getElementById('valorTaximetro');
+    if (elKmTax) elKmTax.innerText = distanciaPercorrida.toFixed(2).replace('.', ',') + ' km';
+    if (elValorTax) elValorTax.innerText = formatarValor(calcularValor(distanciaPercorrida, tarifaAtual));
 }
 
 function formatarTempo(segundos) {
@@ -376,7 +373,6 @@ function calcularDistanciaEntre(lat1, lon1, lat2, lon2) {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-// --- INICIAR CORRIDA ---
 async function iniciarCorrida() {
     if (corridaAtiva) return;
     if (!kmGoogleMaps || kmGoogleMaps <= 0) {
@@ -387,15 +383,19 @@ async function iniciarCorrida() {
     distanciaPercorrida = 0;
     tempoTotalSegundos = 0;
     ultimaPosicao = null;
-    document.getElementById('btnIniciar').disabled = true;
-    document.getElementById('btnParar').disabled = false;
-    document.getElementById('caixaValorFinal').style.display = 'none';
+    const btnIniciar = document.getElementById('btnIniciar');
+    const btnParar = document.getElementById('btnParar');
+    const caixaFinal = document.getElementById('caixaValorFinal');
+    if (btnIniciar) btnIniciar.disabled = true;
+    if (btnParar) btnParar.disabled = false;
+    if (caixaFinal) caixaFinal.style.display = 'none';
     await definirTarifaPorHorario();
     atualizarValorTaximetro();
 
     timerInterval = setInterval(() => {
         tempoTotalSegundos++;
-        document.getElementById('tempo').innerText = formatarTempo(tempoTotalSegundos);
+        const elTempo = document.getElementById('tempo');
+        if (elTempo) elTempo.innerText = formatarTempo(tempoTotalSegundos);
     }, 1000);
 
     if (navigator.geolocation) {
@@ -416,7 +416,6 @@ async function iniciarCorrida() {
     }
 }
 
-// --- ENCERRAR CORRIDA ---
 function pararCorrida() {
     if (!corridaAtiva) return;
     corridaAtiva = false;
@@ -425,33 +424,38 @@ function pararCorrida() {
 
     const valorMaps = calcularValor(kmGoogleMaps, tarifaAtual);
     const valorTax = calcularValor(distanciaPercorrida, tarifaAtual);
-    const valorFinal = Math.min(valorMaps, valorTax); // ✅ Sempre o menor!
+    const valorFinal = Math.min(valorMaps, valorTax);
 
-    document.getElementById('btnIniciar').disabled = false;
-    document.getElementById('btnParar').disabled = true;
-    document.getElementById('btnPix').disabled = !pixKey;
+    const btnIniciar = document.getElementById('btnIniciar');
+    const btnParar = document.getElementById('btnParar');
+    const btnPix = document.getElementById('btnPix');
+    const finalMaps = document.getElementById('finalMaps');
+    const finalTax = document.getElementById('finalTaximetro');
+    const valorFinalEl = document.getElementById('valorFinalMenor');
+    const caixaFinal = document.getElementById('caixaValorFinal');
 
-    // Mostra os 3 valores
-    document.getElementById('finalMaps').innerText = formatarValor(valorMaps) + ' (' + kmGoogleMaps.toFixed(2).replace('.', ',') + ' km)';
-    document.getElementById('finalTaximetro').innerText = formatarValor(valorTax) + ' (' + distanciaPercorrida.toFixed(2).replace('.', ',') + ' km)';
-    document.getElementById('valorFinalMenor').innerText = formatarValor(valorFinal);
-    document.getElementById('caixaValorFinal').style.display = 'block';
+    if (btnIniciar) btnIniciar.disabled = false;
+    if (btnParar) btnParar.disabled = true;
+    if (btnPix) btnPix.disabled = !pixKey;
+    if (finalMaps) finalMaps.innerText = formatarValor(valorMaps) + ' (' + kmGoogleMaps.toFixed(2).replace('.', ',') + ' km)';
+    if (finalTax) finalTax.innerText = formatarValor(valorTax) + ' (' + distanciaPercorrida.toFixed(2).replace('.', ',') + ' km)';
+    if (valorFinalEl) valorFinalEl.innerText = formatarValor(valorFinal);
+    if (caixaFinal) caixaFinal.style.display = 'block';
 
     salvarCorridaNoHistorico(valorMaps, valorTax, valorFinal);
 }
 
-// --- HISTÓRICO E SALVAR ---
 function salvarCorridaNoHistorico(valorMaps, valorTax, valorFinal) {
     const corrida = {
         data: new Date().toLocaleString('pt-BR'),
-        origem: document.getElementById('campoOrigem').value || '-',
-        destino: document.getElementById('campoDestino').value || '-',
+        origem: document.getElementById('campoOrigem') ? document.getElementById('campoOrigem').value || '-' : '-',
+        destino: document.getElementById('campoDestino') ? document.getElementById('campoDestino').value || '-' : '-',
         kmMaps: kmGoogleMaps,
         kmTax: distanciaPercorrida,
         valorMaps: valorMaps,
         valorTax: valorTax,
         valorFinal: valorFinal,
-        tarifa: document.getElementById('tipoTarifa').innerText
+        tarifa: document.getElementById('tipoTarifa') ? document.getElementById('tipoTarifa').innerText : ''
     };
     historicoCorridas.unshift(corrida);
     localStorage.setItem('historicoCorridas', JSON.stringify(historicoCorridas));
@@ -460,6 +464,7 @@ function salvarCorridaNoHistorico(valorMaps, valorTax, valorFinal) {
 
 function atualizarListaCorridas() {
     const lista = document.getElementById('listaCorridasHoje');
+    if (!lista) return;
     if (historicoCorridas.length === 0) {
         lista.innerHTML = '<p style="color:#666; font-size:0.9em;">Nenhuma corrida registrada.</p>';
         return;
@@ -490,7 +495,6 @@ function limparTodoHistorico() {
     }
 }
 
-// --- TABELA E CONFIGURAÇÕES ---
 function atualizarTabelaTarifasUI() {
     const setText = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = formatarValor(val); };
     setText('tabDiaBandeira', tarifas.dia.bandeira); setText('tabDiaKm', tarifas.dia.km); setText('tabDiaMinimo', tarifas.dia.minimo);
@@ -501,29 +505,31 @@ function atualizarTabelaTarifasUI() {
 }
 
 function preencherCamposTarifas() {
-    document.getElementById('diaBandeira').value = tarifas.dia.bandeira;
-    document.getElementById('diaKm').value = tarifas.dia.km;
-    document.getElementById('diaMinimo').value = tarifas.dia.minimo;
-    document.getElementById('noiteBandeira').value = tarifas.noite.bandeira;
-    document.getElementById('noiteKm').value = tarifas.noite.km;
-    document.getElementById('noiteMinimo').value = tarifas.noite.minimo;
-    document.getElementById('fimSemanaBandeira').value = tarifas.fimSemana.bandeira;
-    document.getElementById('fimSemanaKm').value = tarifas.fimSemana.km;
-    document.getElementById('fimSemanaMinimo').value = tarifas.fimSemana.minimo;
-    document.getElementById('interDiaBandeira').value = tarifas.interDia.bandeira;
-    document.getElementById('interDiaKm').value = tarifas.interDia.km;
-    document.getElementById('interDiaMinimo').value = tarifas.interDia.minimo;
-    document.getElementById('interNoiteBandeira').value = tarifas.interNoite.bandeira;
-    document.getElementById('interNoiteKm').value = tarifas.interNoite.km;
-    document.getElementById('interNoiteMinimo').value = tarifas.interNoite.minimo;
+    const el = (id) => document.getElementById(id);
+    if (el('diaBandeira')) el('diaBandeira').value = tarifas.dia.bandeira;
+    if (el('diaKm')) el('diaKm').value = tarifas.dia.km;
+    if (el('diaMinimo')) el('diaMinimo').value = tarifas.dia.minimo;
+    if (el('noiteBandeira')) el('noiteBandeira').value = tarifas.noite.bandeira;
+    if (el('noiteKm')) el('noiteKm').value = tarifas.noite.km;
+    if (el('noiteMinimo')) el('noiteMinimo').value = tarifas.noite.minimo;
+    if (el('fimSemanaBandeira')) el('fimSemanaBandeira').value = tarifas.fimSemana.bandeira;
+    if (el('fimSemanaKm')) el('fimSemanaKm').value = tarifas.fimSemana.km;
+    if (el('fimSemanaMinimo')) el('fimSemanaMinimo').value = tarifas.fimSemana.minimo;
+    if (el('interDiaBandeira')) el('interDiaBandeira').value = tarifas.interDia.bandeira;
+    if (el('interDiaKm')) el('interDiaKm').value = tarifas.interDia.km;
+    if (el('interDiaMinimo')) el('interDiaMinimo').value = tarifas.interDia.minimo;
+    if (el('interNoiteBandeira')) el('interNoiteBandeira').value = tarifas.interNoite.bandeira;
+    if (el('interNoiteKm')) el('interNoiteKm').value = tarifas.interNoite.km;
+    if (el('interNoiteMinimo')) el('interNoiteMinimo').value = tarifas.interNoite.minimo;
 }
 
 function salvarTodasTarifas() {
-    tarifas.dia = { bandeira: parseFloat(document.getElementById('diaBandeira').value), km: parseFloat(document.getElementById('diaKm').value), minimo: parseFloat(document.getElementById('diaMinimo').value) };
-    tarifas.noite = { bandeira: parseFloat(document.getElementById('noiteBandeira').value), km: parseFloat(document.getElementById('noiteKm').value), minimo: parseFloat(document.getElementById('noiteMinimo').value) };
-    tarifas.fimSemana = { bandeira: parseFloat(document.getElementById('fimSemanaBandeira').value), km: parseFloat(document.getElementById('fimSemanaKm').value), minimo: parseFloat(document.getElementById('fimSemanaMinimo').value) };
-    tarifas.interDia = { bandeira: parseFloat(document.getElementById('interDiaBandeira').value), km: parseFloat(document.getElementById('interDiaKm').value), minimo: parseFloat(document.getElementById('interDiaMinimo').value) };
-    tarifas.interNoite = { bandeira: parseFloat(document.getElementById('interNoiteBandeira').value), km: parseFloat(document.getElementById('interNoiteKm').value), minimo: parseFloat(document.getElementById('interNoiteMinimo').value) };
+    const el = (id) => document.getElementById(id);
+    tarifas.dia = { bandeira: parseFloat(el('diaBandeira').value), km: parseFloat(el('diaKm').value), minimo: parseFloat(el('diaMinimo').value) };
+    tarifas.noite = { bandeira: parseFloat(el('noiteBandeira').value), km: parseFloat(el('noiteKm').value), minimo: parseFloat(el('noiteMinimo').value) };
+    tarifas.fimSemana = { bandeira: parseFloat(el('fimSemanaBandeira').value), km: parseFloat(el('fimSemanaKm').value), minimo: parseFloat(el('fimSemanaMinimo').value) };
+    tarifas.interDia = { bandeira: parseFloat(el('interDiaBandeira').value), km: parseFloat(el('interDiaKm').value), minimo: parseFloat(el('interDiaMinimo').value) };
+    tarifas.interNoite = { bandeira: parseFloat(el('interNoiteBandeira').value), km: parseFloat(el('interNoiteKm').value), minimo: parseFloat(el('interNoiteMinimo').value) };
     localStorage.setItem('tarifas', JSON.stringify(tarifas));
     atualizarTabelaTarifasUI();
     definirTarifaPorHorario();
@@ -531,10 +537,11 @@ function salvarTodasTarifas() {
     fecharModal('telaConfiguracoes');
 }
 
-// --- OUTRAS FUNÇÕES ---
 function abrirRotaGoogleMaps() {
-    const origem = encodeURIComponent(document.getElementById('campoOrigem').value);
-    const destino = encodeURIComponent(document.getElementById('campoDestino').value);
+    const elOrigem = document.getElementById('campoOrigem');
+    const elDestino = document.getElementById('campoDestino');
+    const origem = elOrigem ? encodeURIComponent(elOrigem.value) : '';
+    const destino = elDestino ? encodeURIComponent(elDestino.value) : '';
     if (!origem || !destino || origem === '' || destino === '') {
         alert('Preencha origem e destino!'); return;
     }
@@ -546,13 +553,11 @@ function compartilharWhatsapp() {
     const valorMaps = calcularValor(kmGoogleMaps, tarifaAtual);
     const valorTax = calcularValor(distanciaPercorrida, tarifaAtual);
     const valorFinal = Math.min(valorMaps, valorTax);
-    const mensagem = `🏍️ CORRIDA DE MOTO
-📍 Origem: ${document.getElementById('campoOrigem').value}
-🎯 Destino: ${document.getElementById('campoDestino').value}
-📍 Google Maps: ${kmGoogleMaps.toFixed(2).replace('.', ',')} km — ${formatarValor(valorMaps)}
-📱 Taxímetro GPS: ${distanciaPercorrida.toFixed(2).replace('.', ',')} km — ${formatarValor(valorTax)}
-⚖️ Valor cobrado (menor): ${formatarValor(valorFinal)}
-🕐 Tarifa: ${document.getElementById('tipoTarifa').innerText}`;
+    const elOrigem = document.getElementById('campoOrigem');
+    const elDestino = document.getElementById('campoDestino');
+    const origem = elOrigem ? elOrigem.value : '';
+    const destino = elDestino ? elDestino.value : '';
+    const mensagem = `🏍️ CORRIDA DE MOTO\n📍 Origem: ${origem}\n🎯 Destino: ${destino}\n📍 Google Maps: ${kmGoogleMaps.toFixed(2).replace('.', ',')} km — ${formatarValor(valorMaps)}\n📱 Taxímetro GPS: ${distanciaPercorrida.toFixed(2).replace('.', ',')} km — ${formatarValor(valorTax)}\n⚖️ Valor cobrado (menor): ${formatarValor(valorFinal)}\n🕐 Tarifa: ${document.getElementById('tipoTarifa') ? document.getElementById('tipoTarifa').innerText : ''}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(mensagem)}`, '_blank');
 }
 
@@ -561,40 +566,47 @@ function gerarCodigoPix() {
     const valorMaps = calcularValor(kmGoogleMaps, tarifaAtual);
     const valorTax = calcularValor(distanciaPercorrida, tarifaAtual);
     const valorFinal = Math.min(valorMaps, valorTax);
-    document.getElementById('pixValorDisplay').innerText = formatarValor(valorFinal);
-    // Simplificado para exemplo — adicione lógica de PIX se precisar
-    alert('Valor: ' + formatarValor(valorFinal) + '\nConfigure a geração de código Pix completa.');
+    const elPixValor = document.getElementById('pixValorDisplay');
+    if (elPixValor) elPixValor.innerText = formatarValor(valorFinal);
+    alert('Valor a cobrar: ' + formatarValor(valorFinal) + '\nConfigure a geração de código Pix completa.');
 }
 
 function alternarModoEscuro() {
     document.body.classList.toggle('dark-mode');
 }
 
-// --- INICIALIZAÇÃO ---
 window.onload = function() {
     const tarifasSalvas = localStorage.getItem('tarifas');
     if (tarifasSalvas) {
-        const t = JSON.parse(tarifasSalvas);
-        if (t.dia) Object.assign(tarifas.dia, t.dia);
-        if (t.noite) Object.assign(tarifas.noite, t.noite);
-        if (t.fimSemana) Object.assign(tarifas.fimSemana, t.fimSemana);
-        if (t.interDia) Object.assign(tarifas.interDia, t.interDia);
-        if (t.interNoite) Object.assign(tarifas.interNoite, t.interNoite);
+        try {
+            const t = JSON.parse(tarifasSalvas);
+            if (t.dia) Object.assign(tarifas.dia, t.dia);
+            if (t.noite) Object.assign(tarifas.noite, t.noite);
+            if (t.fimSemana) Object.assign(tarifas.fimSemana, t.fimSemana);
+            if (t.interDia) Object.assign(tarifas.interDia, t.interDia);
+            if (t.interNoite) Object.assign(tarifas.interNoite, t.interNoite);
+        } catch(e) { console.log('Tarifas salvas inválidas, usando padrão'); }
     }
     const histSalvo = localStorage.getItem('historicoCorridas');
-    if (histSalvo) historicoCorridas = JSON.parse(histSalvo);
+    if (histSalvo) {
+        try { historicoCorridas = JSON.parse(histSalvo); }
+        catch(e) { console.log('Histórico inválido'); }
+    }
     carregarDadosMotorista();
     atualizarTabelaTarifasUI();
     definirTarifaPorHorario();
     atualizarListaCorridas();
-    
+
+    // Carregamento mais rápido
     setTimeout(() => {
-        document.getElementById('telaCarregamento').style.opacity = '0';
+        const tela = document.getElementById('telaCarregamento');
+        const conteudo = document.getElementById('conteudoPrincipal');
+        if (tela) tela.style.opacity = '0';
         setTimeout(() => {
-            document.getElementById('telaCarregamento').style.display = 'none';
-            document.getElementById('conteudoPrincipal').style.display = 'block';
-        }, 500);
-    }, 800);
+            if (tela) tela.style.display = 'none';
+            if (conteudo) conteudo.style.display = 'block';
+        }, 300);
+    }, 500);
 };
 </script>
 
