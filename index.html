@@ -21,6 +21,7 @@
         #tempo { font-size: 2.0em; font-weight: bold; color: #FF8A00; }
         #tipoTarifa { font-size: 1.4em; font-weight: bold; display: inline-block; margin-top: 10px; background: #E0F2F1; color: #00896B; padding: 8px 14px; border-radius: 20px; border: 1px solid #B2DFDB; }
         #tipoTarifa.intermunicipal { background: #E3F2FD; color: #0D47A1; border-color: #2196F3; }
+        #tipoTarifa.intermunicipal.noturno { background: #BBDEFB; color: #1565C0; border-color: #1976D2; }
         button { padding: 14px; margin: 6px 4px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; background: #00B050; color: white; width: calc(50% - 10px); font-size: 16px; }
         .btn-parar { background: #EF5350; }
         .btn-tabela, .btn-whatsapp, .btn-pix, .btn-rota, .btn-link { width: 100%; margin-top: 8px; }
@@ -32,7 +33,7 @@
         .btn-ajuste { background: #FF9800; width: auto; flex: 1; padding: 10px; min-width: 100px; font-size: 14px; }
         .fechar-btn { background: #FF5722; width: 100%; margin-top: 15px; }
         .aviso-privacidade { background: #E8EAF6; color: #1A237E; padding: 8px; border-radius: 8px; font-size: 0.75em; text-align: center; margin-top: 10px; }
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000; width: 90%; max-width: 400px; max-height: 90vh; overflow-y: auto; text-align: left; }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000; width: 90%; max-width: 420px; max-height: 90vh; overflow-y: auto; text-align: left; }
         .modal-fundo { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
         #tabelaSimulacao { width: 100%; border-collapse: collapse; font-size: 0.8em; }
         #tabelaSimulacao th, #tabelaSimulacao td { border: 1px solid #ccc; padding: 8px 4px; text-align: center; }
@@ -43,7 +44,7 @@
         label { display: block; margin-top: 8px; font-size: 0.9em; color: #444; }
         body.dark-mode h3, body.dark-mode h4, body.dark-mode label { color: #ddd; }
         table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 0.9em; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 0.85em; }
         th { background: #f0f0f0; }
         body.dark-mode th, body.dark-mode td { border-color: #444; }
         body.dark-mode th { background: #333; }
@@ -53,6 +54,8 @@
         #corridasHoje h4 { text-align: center; }
         .corrida-item { border-bottom: 1px solid #ddd; padding: 8px 0; font-size: 0.9em; }
         .corridas-cabecalho { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .grupo-tarifa { border-left: 3px solid #ccc; padding-left: 12px; margin: 15px 0; }
+        .grupo-tarifa.inter { border-left-color: #2196F3; }
         @media(max-width:380px) { #valorDisplay { font-size: 3.2em; } }
     </style>
 </head>
@@ -118,7 +121,6 @@
     <div class="aviso-privacidade">🔒 Seus dados ficam salvos apenas no seu celular — nada é enviado para servidores.</div>
 </div>
 
-<!-- Fundo escuro para modais -->
 <div class="modal-fundo" id="fundoModal" onclick="fecharTodosModais()"></div>
 
 <!-- MODAIS -->
@@ -147,22 +149,11 @@
             <tr><th>Tarifa</th><th>Horário</th><th>Bandeirada</th><th>Valor/km</th><th>Mínimo</th></tr>
         </thead>
         <tbody>
-            <tr>
-                <td>☀️ Dia</td><td>06h às 20h</td>
-                <td id="tabDiaBandeira">R$ 2,50</td><td id="tabDiaKm">R$ 1,15</td><td id="tabDiaMinimo">R$ 6,00</td>
-            </tr>
-            <tr>
-                <td>🌙 Noite</td><td>20h às 06h</td>
-                <td id="tabNoiteBandeira">R$ 3,00</td><td id="tabNoiteKm">R$ 1,30</td><td id="tabNoiteMinimo">R$ 6,00</td>
-            </tr>
-            <tr>
-                <td>🔥 Fim de Semana</td><td>24h</td>
-                <td id="tabFimBandeira">R$ 3,00</td><td id="tabFimKm">R$ 1,30</td><td id="tabFimMinimo">R$ 6,00</td>
-            </tr>
-            <tr style="background:#E3F2FD;">
-                <td>🚛 Intermunicipal</td><td>Qualquer horário</td>
-                <td id="tabInterBandeira">R$ 4,00</td><td id="tabInterKm">R$ 1,80</td><td id="tabInterMinimo">R$ 10,00</td>
-            </tr>
+            <tr><td>☀️ Dia</td><td>06h às 20h</td><td id="tabDiaBandeira">R$ 2,50</td><td id="tabDiaKm">R$ 1,15</td><td id="tabDiaMinimo">R$ 0,00</td></tr>
+            <tr><td>🌙 Noite</td><td>20h às 06h</td><td id="tabNoiteBandeira">R$ 3,00</td><td id="tabNoiteKm">R$ 1,30</td><td id="tabNoiteMinimo">R$ 0,00</td></tr>
+            <tr><td>🔥 Fim de Semana</td><td>24h</td><td id="tabFimBandeira">R$ 3,00</td><td id="tabFimKm">R$ 1,20</td><td id="tabFimMinimo">R$ 0,00</td></tr>
+            <tr style="background:#E3F2FD;"><td>🚛 Interm. Dia</td><td>06h às 20h</td><td id="tabInterDiaBandeira">R$ 3,00</td><td id="tabInterDiaKm">R$ 1,30</td><td id="tabInterDiaMinimo">R$ 0,00</td></tr>
+            <tr style="background:#BBDEFB;"><td>🌙🚛 Interm. Noite</td><td>20h às 06h</td><td id="tabInterNoiteBandeira">R$ 3,50</td><td id="tabInterNoiteKm">R$ 1,45</td><td id="tabInterNoiteMinimo">R$ 0,00</td></tr>
         </tbody>
     </table>
     <button class="fechar-btn" onclick="fecharModal('tabelaTarifas')">❌ Fechar</button>
@@ -176,37 +167,56 @@
 
 <div id="telaConfiguracoes" class="modal">
     <h3>⚙️ CONFIGURAR TARIFAS</h3>
-    <h4>☀️ Dia (06h às 20h)</h4>
-    <label>Bandeirada (R$):</label>
-    <input type="number" id="diaBandeira" step="0.01" value="2.50">
-    <label>Valor por KM (R$):</label>
-    <input type="number" id="diaKm" step="0.01" value="1.15">
-    <label>Valor Mínimo (R$):</label>
-    <input type="number" id="diaMinimo" step="0.01" value="6.00">
 
-    <h4>🌙 Noite (20h às 06h)</h4>
-    <label>Bandeirada (R$):</label>
-    <input type="number" id="noiteBandeira" step="0.01" value="3.00">
-    <label>Valor por KM (R$):</label>
-    <input type="number" id="noiteKm" step="0.01" value="1.30">
-    <label>Valor Mínimo (R$):</label>
-    <input type="number" id="noiteMinimo" step="0.01" value="6.00">
+    <div class="grupo-tarifa">
+        <h4>☀️ Dia (06h às 20h)</h4>
+        <label>Bandeirada (R$):</label>
+        <input type="number" id="diaBandeira" step="0.01" value="2.50">
+        <label>Valor por KM (R$):</label>
+        <input type="number" id="diaKm" step="0.01" value="1.15">
+        <label>Valor Mínimo (R$):</label>
+        <input type="number" id="diaMinimo" step="0.01" value="0.00">
+    </div>
 
-    <h4>🔥 Fim de Semana / Feriado</h4>
-    <label>Bandeirada (R$):</label>
-    <input type="number" id="fimSemanaBandeira" step="0.01" value="3.00">
-    <label>Valor por KM (R$):</label>
-    <input type="number" id="fimSemanaKm" step="0.01" value="1.30">
-    <label>Valor Mínimo (R$):</label>
-    <input type="number" id="fimSemanaMinimo" step="0.01" value="6.00">
+    <div class="grupo-tarifa">
+        <h4>🌙 Noite (20h às 06h)</h4>
+        <label>Bandeirada (R$):</label>
+        <input type="number" id="noiteBandeira" step="0.01" value="3.00">
+        <label>Valor por KM (R$):</label>
+        <input type="number" id="noiteKm" step="0.01" value="1.30">
+        <label>Valor Mínimo (R$):</label>
+        <input type="number" id="noiteMinimo" step="0.01" value="0.00">
+    </div>
 
-    <h4 style="color:#0D47A1; margin-top:15px;">🚛 Intermunicipal</h4>
-    <label>Bandeirada (R$):</label>
-    <input type="number" id="interBandeira" step="0.01" value="4.00">
-    <label>Valor por KM (R$):</label>
-    <input type="number" id="interKm" step="0.01" value="1.80">
-    <label>Valor Mínimo (R$):</label>
-    <input type="number" id="interMinimo" step="0.01" value="10.00">
+    <div class="grupo-tarifa">
+        <h4>🔥 Fim de Semana / Feriado</h4>
+        <label>Bandeirada (R$):</label>
+        <input type="number" id="fimSemanaBandeira" step="0.01" value="3.00">
+        <label>Valor por KM (R$):</label>
+        <input type="number" id="fimSemanaKm" step="0.01" value="1.20">
+        <label>Valor Mínimo (R$):</label>
+        <input type="number" id="fimSemanaMinimo" step="0.01" value="0.00">
+    </div>
+
+    <div class="grupo-tarifa inter">
+        <h4 style="color:#0D47A1;">☀️🚛 Intermunicipal — Dia</h4>
+        <label>Bandeirada (R$):</label>
+        <input type="number" id="interDiaBandeira" step="0.01" value="3.00">
+        <label>Valor por KM (R$):</label>
+        <input type="number" id="interDiaKm" step="0.01" value="1.30">
+        <label>Valor Mínimo (R$):</label>
+        <input type="number" id="interDiaMinimo" step="0.01" value="0.00">
+    </div>
+
+    <div class="grupo-tarifa inter">
+        <h4 style="color:#1565C0;">🌙🚛 Intermunicipal — Noite</h4>
+        <label>Bandeirada (R$):</label>
+        <input type="number" id="interNoiteBandeira" step="0.01" value="3.50">
+        <label>Valor por KM (R$):</label>
+        <input type="number" id="interNoiteKm" step="0.01" value="1.45">
+        <label>Valor Mínimo (R$):</label>
+        <input type="number" id="interNoiteMinimo" step="0.01" value="0.00">
+    </div>
 
     <button class="btn-pix" onclick="salvarTodasTarifas()">💾 SALVAR TARIFAS</button>
     <button class="fechar-btn" onclick="fecharModal('telaConfiguracoes')">❌ Fechar</button>
@@ -234,11 +244,13 @@
 let pixKey = "", nomeMotorista = "", cidadeMotorista = "", whatsApp = "";
 let historicoCorridas = [];
 
+// ESTRUTURA ATUALIZADA: Intermunicipal tem dia e noite separados
 const tarifas = {
-    dia: { bandeira: 2.50, km: 1.15, minimo: 6.00 },
-    noite: { bandeira: 3.00, km: 1.30, minimo: 6.00 },
-    fimSemana: { bandeira: 3.00, km: 1.30, minimo: 6.00 },
-    intermunicipal: { bandeira: 4.00, km: 1.80, minimo: 10.00 }
+    dia: { bandeira: 2.50, km: 1.15, minimo: 0.00 },
+    noite: { bandeira: 3.00, km: 1.30, minimo: 0.00 },
+    fimSemana: { bandeira: 3.00, km: 1.20, minimo: 0.00 },
+    interDia: { bandeira: 3.00, km: 1.30, minimo: 0.00 },
+    interNoite: { bandeira: 3.50, km: 1.45, minimo: 0.00 }
 };
 let tarifaAtual = tarifas.dia;
 let corridaAtiva = false;
@@ -314,17 +326,14 @@ function alternarIntermunicipal() {
     intermunicipalAtivo = !intermunicipalAtivo;
     const btn = document.getElementById('btnIntermunicipal');
     const campos = document.getElementById('camposIntermunicipal');
-    const tipoTarifaEl = document.getElementById('tipoTarifa');
     if (intermunicipalAtivo) {
         btn.innerText = '🚛 Intermunicipal: ATIVADO';
         btn.classList.add('ativo');
         campos.style.display = 'block';
-        tipoTarifaEl.classList.add('intermunicipal');
     } else {
         btn.innerText = '🚛 Intermunicipal: Desativado';
         btn.classList.remove('ativo');
         campos.style.display = 'none';
-        tipoTarifaEl.classList.remove('intermunicipal');
     }
     if (!corridaAtiva) definirTarifaPorHorario();
 }
@@ -341,9 +350,12 @@ function atualizarTabelaTarifasUI() {
     setText('tabFimBandeira', tarifas.fimSemana.bandeira);
     setText('tabFimKm', tarifas.fimSemana.km);
     setText('tabFimMinimo', tarifas.fimSemana.minimo);
-    setText('tabInterBandeira', tarifas.intermunicipal.bandeira);
-    setText('tabInterKm', tarifas.intermunicipal.km);
-    setText('tabInterMinimo', tarifas.intermunicipal.minimo);
+    setText('tabInterDiaBandeira', tarifas.interDia.bandeira);
+    setText('tabInterDiaKm', tarifas.interDia.km);
+    setText('tabInterDiaMinimo', tarifas.interDia.minimo);
+    setText('tabInterNoiteBandeira', tarifas.interNoite.bandeira);
+    setText('tabInterNoiteKm', tarifas.interNoite.km);
+    setText('tabInterNoiteMinimo', tarifas.interNoite.minimo);
 }
 
 function preencherCamposTarifas() {
@@ -356,37 +368,53 @@ function preencherCamposTarifas() {
     document.getElementById('fimSemanaBandeira').value = tarifas.fimSemana.bandeira;
     document.getElementById('fimSemanaKm').value = tarifas.fimSemana.km;
     document.getElementById('fimSemanaMinimo').value = tarifas.fimSemana.minimo;
-    document.getElementById('interBandeira').value = tarifas.intermunicipal.bandeira;
-    document.getElementById('interKm').value = tarifas.intermunicipal.km;
-    document.getElementById('interMinimo').value = tarifas.intermunicipal.minimo;
+    document.getElementById('interDiaBandeira').value = tarifas.interDia.bandeira;
+    document.getElementById('interDiaKm').value = tarifas.interDia.km;
+    document.getElementById('interDiaMinimo').value = tarifas.interDia.minimo;
+    document.getElementById('interNoiteBandeira').value = tarifas.interNoite.bandeira;
+    document.getElementById('interNoiteKm').value = tarifas.interNoite.km;
+    document.getElementById('interNoiteMinimo').value = tarifas.interNoite.minimo;
 }
 
 async function definirTarifaPorHorario() {
-    if (intermunicipalAtivo) {
-        tarifaAtual = tarifas.intermunicipal;
-        document.getElementById('tipoTarifa').innerHTML = '🚛 Intermunicipal';
-        return;
-    }
     const agora = new Date();
     const diaSemana = agora.getDay();
     const hora = agora.getHours();
-    if (diaSemana === 0 || diaSemana === 6) {
-        tarifaAtual = tarifas.fimSemana;
-        document.getElementById('tipoTarifa').innerHTML = '🔥 Fim de Semana';
+    const tipoTarifaEl = document.getElementById('tipoTarifa');
+    tipoTarifaEl.classList.remove('intermunicipal', 'noturno');
+
+    if (intermunicipalAtivo) {
+        if (hora >= 6 && hora < 20) {
+            tarifaAtual = tarifas.interDia;
+            tipoTarifaEl.innerHTML = '☀️🚛 Intermunicipal — Dia';
+            tipoTarifaEl.classList.add('intermunicipal');
+        } else {
+            tarifaAtual = tarifas.interNoite;
+            tipoTarifaEl.innerHTML = '🌙🚛 Intermunicipal — Noite';
+            tipoTarifaEl.classList.add('intermunicipal', 'noturno');
+        }
         return;
     }
+
+    if (diaSemana === 0 || diaSemana === 6) {
+        tarifaAtual = tarifas.fimSemana;
+        tipoTarifaEl.innerHTML = '🔥 Fim de Semana';
+        return;
+    }
+
     if (hora >= 6 && hora < 20) {
         tarifaAtual = tarifas.dia;
-        document.getElementById('tipoTarifa').innerHTML = '☀️ Tarifa de Dia';
+        tipoTarifaEl.innerHTML = '☀️ Tarifa de Dia';
     } else {
         tarifaAtual = tarifas.noite;
-        document.getElementById('tipoTarifa').innerHTML = '🌙 Tarifa de Noite';
+        tipoTarifaEl.innerHTML = '🌙 Tarifa de Noite';
     }
 }
 
 function calcularValorTotal(distancia, tarifa = tarifaAtual) {
     let valor = tarifa.bandeira + (distancia * tarifa.km);
-    return valor < tarifa.minimo ? tarifa.minimo : valor;
+    // Se não houver mínimo (0), retorna o valor calculado
+    return tarifa.minimo > 0 && valor < tarifa.minimo ? tarifa.minimo : valor;
 }
 
 function atualizarInterface(distancia, valor) {
@@ -542,13 +570,14 @@ function abrirRotaGoogleMaps() {
 
 function gerarTabelaSimulacao() {
     const container = document.getElementById('tabelaSimulacao');
-    let html = '<table><thead style="background:#00B050; color:white;"><tr><th>Km</th><th>☀️ Dia</th><th>🌙 Noite</th><th>🔥 Fim</th><th>🚛 Inter</th></tr></thead><tbody>';
+    let html = '<table><thead style="background:#00B050; color:white;"><tr><th>Km</th><th>☀️ Dia</th><th>🌙 Noite</th><th>🔥 Fim</th><th>☀️🚛 Inter Dia</th><th>🌙🚛 Inter Noite</th></tr></thead><tbody>';
     for (let km = 0.5; km <= 80; km += 0.5) {
         html += `<tr><td>${km.toFixed(1)}</td>
             <td>R$ ${calcularValorTotal(km, tarifas.dia).toFixed(2).replace('.', ',')}</td>
             <td>R$ ${calcularValorTotal(km, tarifas.noite).toFixed(2).replace('.', ',')}</td>
             <td>R$ ${calcularValorTotal(km, tarifas.fimSemana).toFixed(2).replace('.', ',')}</td>
-            <td>R$ ${calcularValorTotal(km, tarifas.intermunicipal).toFixed(2).replace('.', ',')}</td></tr>`;
+            <td>R$ ${calcularValorTotal(km, tarifas.interDia).toFixed(2).replace('.', ',')}</td>
+            <td>R$ ${calcularValorTotal(km, tarifas.interNoite).toFixed(2).replace('.', ',')}</td></tr>`;
     }
     html += '</tbody></table>';
     container.innerHTML = html;
@@ -558,7 +587,8 @@ function salvarTodasTarifas() {
     tarifas.dia = { bandeira: parseFloat(document.getElementById('diaBandeira').value), km: parseFloat(document.getElementById('diaKm').value), minimo: parseFloat(document.getElementById('diaMinimo').value) };
     tarifas.noite = { bandeira: parseFloat(document.getElementById('noiteBandeira').value), km: parseFloat(document.getElementById('noiteKm').value), minimo: parseFloat(document.getElementById('noiteMinimo').value) };
     tarifas.fimSemana = { bandeira: parseFloat(document.getElementById('fimSemanaBandeira').value), km: parseFloat(document.getElementById('fimSemanaKm').value), minimo: parseFloat(document.getElementById('fimSemanaMinimo').value) };
-    tarifas.intermunicipal = { bandeira: parseFloat(document.getElementById('interBandeira').value), km: parseFloat(document.getElementById('interKm').value), minimo: parseFloat(document.getElementById('interMinimo').value) };
+    tarifas.interDia = { bandeira: parseFloat(document.getElementById('interDiaBandeira').value), km: parseFloat(document.getElementById('interDiaKm').value), minimo: parseFloat(document.getElementById('interDiaMinimo').value) };
+    tarifas.interNoite = { bandeira: parseFloat(document.getElementById('interNoiteBandeira').value), km: parseFloat(document.getElementById('interNoiteKm').value), minimo: parseFloat(document.getElementById('interNoiteMinimo').value) };
     localStorage.setItem('tarifas', JSON.stringify(tarifas));
     atualizarTabelaTarifasUI();
     definirTarifaPorHorario();
@@ -630,7 +660,8 @@ function enviarLinkPassageiro() {
         diaBandeira: tarifas.dia.bandeira, diaKm: tarifas.dia.km, diaMinimo: tarifas.dia.minimo,
         noiteBandeira: tarifas.noite.bandeira, noiteKm: tarifas.noite.km, noiteMinimo: tarifas.noite.minimo,
         fimSemanaBandeira: tarifas.fimSemana.bandeira, fimSemanaKm: tarifas.fimSemana.km, fimSemanaMinimo: tarifas.fimSemana.minimo,
-        interBandeira: tarifas.intermunicipal.bandeira, interKm: tarifas.intermunicipal.km, interMinimo: tarifas.intermunicipal.minimo
+        interDiaBandeira: tarifas.interDia.bandeira, interDiaKm: tarifas.interDia.km, interDiaMinimo: tarifas.interDia.minimo,
+        interNoiteBandeira: tarifas.interNoite.bandeira, interNoiteKm: tarifas.interNoite.km, interNoiteMinimo: tarifas.interNoite.minimo
     });
     const link = `https://adriano360ws-droid.github.io/taximetro-passageiro-dinamico/?${params.toString()}`;
     const mensagem = `🏍️ Solicitar corrida com ${nomeMotorista}:\n${link}`;
@@ -645,7 +676,8 @@ window.onload = function() {
         if (t.dia) Object.assign(tarifas.dia, t.dia);
         if (t.noite) Object.assign(tarifas.noite, t.noite);
         if (t.fimSemana) Object.assign(tarifas.fimSemana, t.fimSemana);
-        if (t.intermunicipal) Object.assign(tarifas.intermunicipal, t.intermunicipal);
+        if (t.interDia) Object.assign(tarifas.interDia, t.interDia);
+        if (t.interNoite) Object.assign(tarifas.interNoite, t.interNoite);
     }
     const histSalvo = localStorage.getItem('historicoCorridas');
     if (histSalvo) historicoCorridas = JSON.parse(histSalvo);
@@ -654,7 +686,6 @@ window.onload = function() {
     definirTarifaPorHorario();
     atualizarListaCorridas();
     
-    // Oculta tela de carregamento e mostra conteúdo
     setTimeout(() => {
         const tela = document.getElementById('telaCarregamento');
         const conteudo = document.getElementById('conteudoPrincipal');
