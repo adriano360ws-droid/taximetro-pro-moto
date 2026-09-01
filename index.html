@@ -213,6 +213,12 @@
         </div>
         <button class="fechar-btn" onclick="fecharJanela('telaDadosMotorista')">❌ Fechar</button>
     </div>
+
+    <div id="simulacaoTarifas">
+        <h3>📈 SIMULAÇÃO DE PREÇOS POR KM</h3>
+        <div id="tabelaSimulacaoContainer"></div>
+        <button class="fechar-btn" onclick="fecharJanela('simulacaoTarifas')">❌ Fechar</button>
+    </div>
 </div>
 
 <script>
@@ -455,6 +461,64 @@
         return null;
     }
 
+    // ---------- ROTAS E LINKS ----------
+    function abrirRotaGoogleMaps() {
+        const origem = encodeURIComponent(document.getElementById('campoOrigem').value.trim() + ', Brasil');
+        const destino = encodeURIComponent(document.getElementById('campoDestino').value.trim() + ', Brasil');
+        if (!origem || !destino || origem === ', Brasil' || destino === ', Brasil') {
+            alert('Por favor preencha a origem e o destino.');
+            return;
+        }
+        window.open(`https://www.google.com/maps/dir/?api=1&origin=${origem}&destination=${destino}`, '_blank');
+    }
+
+    function enviarLinkPassageiro() {
+        const origem = encodeURIComponent(document.getElementById('campoOrigem').value.trim());
+        const destino = encodeURIComponent(document.getElementById('campoDestino').value.trim());
+        const link = window.location.origin + window.location.pathname + `?origem=${origem}&destino=${destino}`;
+        if (navigator.share) {
+            navigator.share({ title: 'Taxímetro Moto - Corrida', url: link });
+        } else {
+            navigator.clipboard.writeText(link).then(() => alert('✅ Link copiado!'));
+        }
+    }
+
+    function compartilharWhatsapp() {
+        const valor = document.getElementById('valorDisplay').innerText;
+        const origem = document.getElementById('campoOrigem').value;
+        const destino = document.getElementById('campoDestino').value;
+        const mensagem = `🚕 *Corrida de Moto*\n📍 Origem: ${origem}\n🏁 Destino: ${destino}\n💰 Valor: ${valor}`;
+        const url = `https://wa.me/${whatsApp}?text=${encodeURIComponent(mensagem)}`;
+        window.open(url, '_blank');
+    }
+
+    // ---------- PIX ----------
+    function gerarCodigoPix() {
+        if (!pixKey) { alert('Configure sua chave Pix em "Meus Dados".'); abrirTelaDadosMotorista(); return; }
+        const valorTexto = document.getElementById('valorDisplay').innerText.replace('R$ ', '').replace(',', '.');
+        const valorNum = parseFloat(valorTexto);
+        if (isNaN(valorNum) || valorNum <= 0) { alert('Inicie e finalize uma corrida primeiro.'); return; }
+        document.getElementById('pixValorDisplay').innerText = document.getElementById('valorDisplay').innerText;
+        document.getElementById('campoCodigoPixModal').value = `Chave Pix: ${pixKey}\nValor: R$ ${valorTexto}\nTitular: ${nomeMotorista}`;
+        document.getElementById('pixModal').style.display = 'block';
+    }
+
+    function copiarCodigoPixModal() {
+        navigator.clipboard.writeText(document.getElementById('campoCodigoPixModal').value).then(() => alert('✅ Copiado!'));
+    }
+
+    // ---------- BLOQUEIO DE TELA ----------
+    async function solicitarWakeLock() {
+        if ('wakeLock' in navigator) {
+            try { wakeLock = await navigator.wakeLock.request('screen'); }
+            catch (err) { console.log('Wake Lock não disponível'); }
+        }
+    }
+
+    function liberarWakeLock() {
+        if (wakeLock) { wakeLock.release(); wakeLock = null; }
+    }
+
     // ---------- ATUALIZAÇÃO DO QUADRO ----------
     async function atualizarDistanciaGoogleMaps() {
         const origem = document.getElementById('campoOrigem').value.trim();
@@ -642,54 +706,4 @@
         }
     }
 
-    // ---------- CONFIGURAÇÕES DE TARIFAS ----------
-    function abrirTelaConfiguracoes() {
-        document.getElementById('diaBandeira').value = tarifas.dia.bandeira;
-        document.getElementById('diaKm').value = tarifas.dia.km;
-        document.getElementById('diaMinimo').value = tarifas.dia.minimo;
-        document.getElementById('noiteBandeira').value = tarifas.noite.bandeira;
-        document.getElementById('noiteKm').value = tarifas.noite.km;
-        document.getElementById('noiteMinimo').value = tarifas.noite.minimo;
-        document.getElementById('fimSemanaBandeira').value = tarifas.fimSemana.bandeira;
-        document.getElementById('fimSemanaKm').value = tarifas.fimSemana.km;
-        document.getElementById('fimSemanaMinimo').value = tarifas.fimSemana.minimo;
-        document.getElementById('interBandeira').value = tarifas.intermunicipal.bandeira;
-        document.getElementById('interKm').value = tarifas.intermunicipal.km;
-        document.getElementById('interMinimo').value = tarifas.intermunicipal.minimo;
-        document.getElementById('telaConfiguracoes').style.display = 'block';
-    }
-
-    function salvarTodasTarifas() {
-        tarifas.dia = {
-            bandeira: parseFloat(document.getElementById('diaBandeira').value),
-            km: parseFloat(document.getElementById('diaKm').value),
-            minimo: parseFloat(document.getElementById('diaMinimo').value)
-        };
-        tarifas.noite = {
-            bandeira: parseFloat(document.getElementById('noiteBandeira').value),
-            km: parseFloat(document.getElementById('noiteKm').value),
-            minimo: parseFloat(document.getElementById('noiteMinimo').value)
-        };
-        tarifas.fimSemana = {
-            bandeira: parseFloat(document.getElementById('fimSemanaBandeira').value),
-            km: parseFloat(document.getElementById('fimSemanaKm').value),
-            minimo: parseFloat(document.getElementById('fimSemanaMinimo').value)
-        };
-        tarifas.intermunicipal = {
-            bandeira: parseFloat(document.getElementById('interBandeira').value),
-            km: parseFloat(document.getElementById('interKm').value),
-            minimo: parseFloat(document.getElementById('interMinimo').value)
-        };
-        localStorage.setItem('configuracoesTarifas', JSON.stringify(tarifas));
-        atualizarTabelaTarifasUI();
-        definirTarifaPorHorario();
-        alert('✅ Tarifas salvas!');
-        fecharJanela('telaConfiguracoes');
-    }
-
-    // ---------- SIMULAÇÃO ----------
-    function abrirSimulacao() {
-        const container = document.getElementById('tabelaSimulacao');
-        let html = '<table id="tabelaSimulacao" style="width:100%;"><thead><tr style="background:#00BFA5;color:white;"><th>Km</th><th>☀️ Dia</th><th>🌙 Noite</th><th>🔥 Fim de Semana</th><th>🚛 Inter</th></tr></thead><tbody>';
-        for (let km = 0.1; km <= 80.0; km = Math.round((km + 0.1) * 10) / 10) {
-            const vDia = calcularValor
+    // --------
