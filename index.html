@@ -9,52 +9,101 @@
     <meta name="theme-color" content="#00B050">
     <title>Taxímetro Pro - Moto</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icone-192.png">
+    <link rel="apple-touch-icon" href="icone-192.png">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', Arial, sans-serif; }
         body { background: #E3F2FD; text-align: center; padding: 15px; }
         body.dark-mode { background: #121212; color: #FFF; }
         body.dark-mode .box, body.dark-mode .modal { background: #1E1E1E; color: #FFF; border-color: #333; }
         .container { max-width: 420px; margin: auto; }
-        h2 { color: #00897B; margin-bottom: 15px; }
-        .box { background: white; border-radius: 16px; padding: 15px; margin: 10px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h2 { color: #00897B; margin-bottom: 15px; font-size: 1.8em; }
+        
+        .box { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 25px 15px; 
+            margin: 12px 0; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+            font-size: 1.1em; 
+        }
         .box-maps { border: 2px solid #4285F4; background: #F0F7FF; }
         .box-taximetro { border: 2px solid #00B050; background: #F0FFF4; }
         .box-final { border: 3px solid #FF9800; background: #FFF8E1; }
-        .valor-maps { font-size: 1.8em; font-weight: bold; color: #4285F4; }
-        .valor-taximetro { font-size: 2.2em; font-weight: 900; color: #00896B; }
-        .valor-final { font-size: 2.8em; font-weight: 900; color: #FF6F00; }
-        .label-valor { font-size: 0.9em; color: #666; }
-        #tipoTarifa { font-size: 1.2em; font-weight: bold; display: inline-block; margin: 8px 0; background: #E0F2F1; color: #00896B; padding: 6px 12px; border-radius: 20px; border: 1px solid #B2DFDB; }
+        .box-simulacao { border: 2px solid #FF9800; background: #FFF8E1; }
+        
+        .valor-maps { 
+            font-size: 3.8em; 
+            font-weight: bold; 
+            color: #4285F4; 
+            margin: 12px 0; 
+        }
+        .valor-taximetro { 
+            font-size: 4.5em; 
+            font-weight: 900; 
+            color: #00896B; 
+            margin: 12px 0; 
+        }
+        .valor-final { 
+            font-size: 4.5em; 
+            font-weight: 900; 
+            color: #FF6F00; 
+            margin: 12px 0; 
+        }
+        .label-valor { font-size: 1.2em; color: #666; }
+        #tipoTarifa { font-size: 1.4em; font-weight: bold; display: inline-block; margin: 8px 0; background: #E0F2F1; color: #00896B; padding: 8px 16px; border-radius: 20px; border: 1px solid #B2DFDB; }
         #tipoTarifa.intermunicipal { background: #E3F2FD; color: #0D47A1; border-color: #2196F3; }
         #tipoTarifa.noturno { background: #EDE7F6; color: #512DA8; border-color: #9575CD; }
-        button { padding: 14px; margin: 6px 4px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; background: #00B050; color: white; width: calc(50% - 10px); font-size: 16px; }
+        
+        button { padding: 14px; margin: 6px 4px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; background: #00B050; color: white; width: calc(50% - 10px); font-size: 18px; }
         .btn-parar { background: #EF5350; }
-        .btn-tabela, .btn-whatsapp, .btn-pix, .btn-rota, .btn-intermunicipal { width: 100%; margin-top: 8px; }
-        .btn-intermunicipal { background: #2196F3; padding: 14px; border-radius: 12px; font-weight: bold; color: white; cursor: pointer; font-size: 16px; }
-        .btn-intermunicipal.j { background: #1565C0; }
+        .btn-tabela, .btn-whatsapp, .btn-pix, .btn-rota, .btn-intermunicipal, .btn-simulacao { width: 100%; margin-top: 8px; }
+        .btn-intermunicipal { background: #2196F3; padding: 14px; border-radius: 12px; font-weight: bold; color: white; cursor: pointer; font-size: 18px; }
+        .btn-intermunicipal.ativo { background: #1565C0; }
+        .btn-simulacao { background: #FF9800; }
+        
         input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid #ccc; background: #FFF; font-size: 16px; }
         .botoes-ajustes { display: flex; gap: 8px; margin: 10px 0; flex-wrap: wrap; }
-        .btn-ajuste { background: #FF9800; width: auto; flex: 1; padding: 10px; min-width: 90px; font-size: 14px; }
+        .btn-ajuste { background: #FF9800; width: auto; flex: 1; padding: 10px; min-width: 90px; font-size: 15px; }
         .fechar-btn { background: #FF5722; width: 100%; margin-top: 15px; }
-        .aviso-privacidade { background: #E8EAF6; color: #1A237E; padding: 8px; border-radius: 8px; font-size: 0.75em; text-align: center; margin-top: 10px; }
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000; width: 90%; max-width: 420px; max-height: 90vh; overflow-y: auto; }
+        .aviso-privacidade { background: #E8EAF6; color: #1A237E; padding: 8px; border-radius: 8px; font-size: 0.9em; text-align: center; margin-top: 10px; }
+        
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000; width: 95%; max-width: 460px; max-height: 90vh; overflow-y: auto; }
         .modal-fundo { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
-        .tela-carregamento { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #00B050, #00897B); display: flex; align-items: center; justify-content: center; color: white; z-index: 2000; transition: opacity 0.3s; flex-direction: column; gap: 15px; font-size: 1.2em; }
-        .btn-limpar-hoje { background: #D32F2F; font-size: 0.8em; padding: 8px; width: auto; margin-left: 4px; }
-        h3 { margin-bottom: 15px; color: #333; text-align: center; }
-        h4 { margin: 15px 0 8px; color: #555; }
-        label { display: block; margin-top: 8px; font-size: 0.9em; color: #444; }
+        .tela-carregamento { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #00B050, #00897B); display: flex; align-items: center; justify-content: center; color: white; z-index: 2000; transition: opacity 0.3s; flex-direction: column; gap: 15px; font-size: 1.4em; }
+        .btn-limpar-hoje { background: #D32F2F; font-size: 0.9em; padding: 8px; width: auto; margin-left: 4px; }
+        
+        h3 { margin-bottom: 15px; color: #333; text-align: center; font-size: 1.4em; }
+        h4 { margin: 15px 0 8px; color: #555; font-size: 1.25em; }
+        label { display: block; margin-top: 8px; font-size: 1em; color: #444; }
         body.dark-mode h3, body.dark-mode h4, body.dark-mode label { color: #ddd; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.9em; }
-        th, td { border: 1px solid #ddd; padding: 8px 4px; text-align: center; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.95em; }
+        th, td { border: 1px solid #ddd; padding: 10px 6px; text-align: center; }
         th { background: #f0f0f0; }
         body.dark-mode th, body.dark-mode td { border-color: #444; }
         body.dark-mode th { background: #333; }
-        .corrida-item { border-bottom: 1px solid #ddd; padding: 8px 0; font-size: 0.9em; }
+        
+        .corrida-item { border-bottom: 1px solid #ddd; padding: 10px 0; font-size: 0.95em; }
         .grupo-tarifa { border-left: 3px solid #ccc; padding-left: 12px; margin: 15px 0; }
         .grupo-tarifa.inter { border-left-color: #2196F3; }
-        .dados-rota { font-size: 0.9em; color: #555; margin: 5px 0; }
-        @media(max-width:380px) { .valor-final { font-size: 2.2em; } }
+        .dados-rota { font-size: 1em; color: #555; margin: 8px 0; }
+        
+        /* Tabela de Simulação */
+        .tabela-simulacao { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }
+        .tabela-simulacao th, .tabela-simulacao td { border: 1px solid #ddd; padding: 5px 3px; text-align: center; white-space: nowrap; }
+        .tabela-simulacao th { background: #FF9800; color: white; }
+        .tabela-simulacao tr:nth-child(even) { background: #FFF3E0; }
+        .tabela-simulacao tr:nth-child(odd) { background: #FFF; }
+        
+        @media(max-width:380px) { 
+            .valor-final { font-size: 3.6em; } 
+            .valor-taximetro { font-size: 3.8em; }
+            .valor-maps { font-size: 3.2em; }
+            .box { padding: 18px 12px; }
+            .tabela-simulacao { font-size: 0.75em; }
+            .tabela-simulacao th, .tabela-simulacao td { padding: 4px 2px; }
+        }
     </style>
 </head>
 <body>
@@ -79,7 +128,7 @@
         <h4>📍 Dados da Rota</h4>
         <input type="text" id="campoOrigem" placeholder="Origem / Rua e número">
         <input type="text" id="campoDestino" placeholder="Destino / Cidade ou bairro">
-        <input type="number" id="kmGoogleMaps" step="0.01" placeholder="Distância em km (do Google Maps)" oninput="atualizarValorMaps()">
+        <input type="number" id="kmGoogleMaps" step="0.01" placeholder="Distância em km (do Google Maps)" oninput="atualizarValorMaps(); atualizarTabelaSimulacao();">
         <div class="dados-rota">
             <strong>Origem:</strong> <span id="exibeOrigem">-</span><br>
             <strong>Destino:</strong> <span id="exibeDestino">-</span>
@@ -89,7 +138,7 @@
     <div class="box box-maps">
         <div class="label-valor">📍 Valor Estimado (Google Maps)</div>
         <div class="valor-maps" id="valorMaps">R$ 0,00</div>
-        <div style="font-size:0.85em;">Distância: <span id="kmMaps">0,00</span> km</div>
+        <div style="font-size:1em;">Distância: <span id="kmMaps">0,00</span> km</div>
     </div>
 
     <div class="box box-taximetro">
@@ -109,6 +158,7 @@
         <div class="valor-final">Menor: <span id="valorFinalMenor">R$ 0,00</span></div>
     </div>
 
+    <button class="btn-simulacao" onclick="abrirModal('tabelaSimulacaoModal')">📊 TABELA DE SIMULAÇÃO (até 80 km)</button>
     <button class="btn-rota" onclick="abrirRotaGoogleMaps()">🗺️ ABRIR ROTA NO MAPS</button>
     <button class="btn-tabela" onclick="abrirModal('tabelaTarifas')">📊 TABELA DE TARIFAS</button>
     <button class="btn-whatsapp" onclick="compartilharWhatsapp()">💬 ENVIAR POR WHATSAPP</button>
@@ -125,6 +175,28 @@
 </div>
 
 <div class="modal-fundo" id="fundoModal" onclick="fecharTodosModais()"></div>
+
+<div id="tabelaSimulacaoModal" class="modal">
+    <h3>📊 TABELA DE SIMULAÇÃO DE PREÇOS (até 80 km)</h3>
+    <div style="overflow-x:auto;">
+        <table class="tabela-simulacao" id="corpoTabelaSimulacao">
+            <thead>
+                <tr>
+                    <th>KM</th>
+                    <th>☀️ Dia</th>
+                    <th>🌙 Noite</th>
+                    <th>🔥 Fim de Semana</th>
+                    <th>🚛 Inter. Dia</th>
+                    <th>🌙🚛 Inter. Noite</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaSimulacaoCorpo">
+                <!-- Gerado automaticamente -->
+            </tbody>
+        </table>
+    </div>
+    <button class="fechar-btn" onclick="fecharModal('tabelaSimulacaoModal')">❌ Fechar</button>
+</div>
 
 <div id="pixModal" class="modal">
     <h3>💳 PAGAMENTO PIX</h3>
@@ -224,6 +296,7 @@ function abrirModal(id) {
     document.getElementById('fundoModal').style.display = 'block';
     if (id === 'telaConfiguracoes') preencherCamposTarifas();
     if (id === 'telaDadosMotorista') carregarDadosMotorista();
+    if (id === 'tabelaSimulacaoModal') atualizarTabelaSimulacao();
 }
 function fecharModal(id) {
     document.getElementById(id).style.display = 'none';
@@ -281,6 +354,7 @@ function alternarIntermunicipal() {
     }
     if (!corridaAtiva) definirTarifaPorHorario();
     atualizarValorMaps();
+    atualizarTabelaSimulacao();
 }
 
 function definirTarifaPorHorario() {
@@ -317,6 +391,7 @@ function definirTarifaPorHorario() {
         if (tipoTarifaEl) { tipoTarifaEl.innerHTML = '🌙 Tarifa de Noite'; tipoTarifaEl.classList.add('noturno'); }
     }
     atualizarValorMaps();
+    atualizarTabelaSimulacao();
     if (corridaAtiva) atualizarValorTaximetro();
 }
 
@@ -348,6 +423,28 @@ function atualizarValorMaps() {
     if (elExibeDestino) elExibeDestino.innerText = destino;
     if (elKmMaps) elKmMaps.innerText = kmGoogleMaps.toFixed(2).replace('.', ',');
     if (elValorMaps) elValorMaps.innerText = formatarValor(calcularValor(kmGoogleMaps, tarifaAtual));
+}
+
+function atualizarTabelaSimulacao() {
+    const corpo = document.getElementById('tabelaSimulacaoCorpo');
+    if (!corpo) return;
+    let html = '';
+    for (let km = 1; km <= 80; km++) {
+        const vDia = calcularValor(km, tarifas.dia);
+        const vNoite = calcularValor(km, tarifas.noite);
+        const vFim = calcularValor(km, tarifas.fimSemana);
+        const vInterDia = calcularValor(km, tarifas.interDia);
+        const vInterNoite = calcularValor(km, tarifas.interNoite);
+        html += `<tr>
+            <td>${km}</td>
+            <td>${formatarValor(vDia)}</td>
+            <td>${formatarValor(vNoite)}</td>
+            <td>${formatarValor(vFim)}</td>
+            <td>${formatarValor(vInterDia)}</td>
+            <td>${formatarValor(vInterNoite)}</td>
+        </tr>`;
+    }
+    corpo.innerHTML = html;
 }
 
 function atualizarValorTaximetro() {
@@ -465,7 +562,7 @@ function atualizarListaCorridas() {
     const lista = document.getElementById('listaCorridasHoje');
     if (!lista) return;
     if (historicoCorridas.length === 0) {
-        lista.innerHTML = '<p style="color:#666; font-size:0.9em;">Nenhuma corrida registrada.</p>';
+        lista.innerHTML = '<p style="color:#666; font-size:1em;">Nenhuma corrida registrada.</p>';
         return;
     }
     lista.innerHTML = historicoCorridas.map(c => `
@@ -531,6 +628,7 @@ function salvarTodasTarifas() {
     tarifas.interNoite = { bandeira: parseFloat(el('interNoiteBandeira').value), km: parseFloat(el('interNoiteKm').value), minimo: parseFloat(el('interNoiteMinimo').value) };
     localStorage.setItem('tarifas', JSON.stringify(tarifas));
     atualizarTabelaTarifasUI();
+    atualizarTabelaSimulacao();
     definirTarifaPorHorario();
     alert('✅ Tarifas salvas!');
     fecharModal('telaConfiguracoes');
@@ -584,7 +682,8 @@ window.onload = function() {
         try {
             const t = JSON.parse(tarifasSalvas);
             if (t.dia) Object.assign(tarifas.dia, t.dia);
-            if (t.noite) Object.assign(tarifas.noite, t.noite);
+            if (t.noite) Object.assign
+(tarifas.noite, t.noite);
             if (t.fimSemana) Object.assign(tarifas.fimSemana, t.fimSemana);
             if (t.interDia) Object.assign(tarifas.interDia, t.interDia);
             if (t.interNoite) Object.assign(tarifas.interNoite, t.interNoite);
@@ -595,18 +694,17 @@ window.onload = function() {
         try { historicoCorridas = JSON.parse(histSalvo); }
         catch(e) { console.log('Histórico inválido'); }
     }
-    carregarDadosMotorista();
-    atualizarTabelaTarifasUI();
-    definirTarifaPorHorario();
     atualizarListaCorridas();
+    definirTarifaPorHorario();
+    atualizarTabelaTarifasUI();
+    atualizarTabelaSimulacao();
 
+    // Esconde a tela de carregamento após carregar tudo
     setTimeout(() => {
-        const tela = document.getElementById('telaCarregamento');
-        const conteudo = document.getElementById('conteudoPrincipal');
-        if (tela) tela.style.opacity = '0';
+        document.getElementById('telaCarregamento').style.opacity = '0';
         setTimeout(() => {
-            if (tela) tela.style.display = 'none';
-            if (conteudo) conteudo.style.display = 'block';
+            document.getElementById('telaCarregamento').style.display = 'none';
+            document.getElementById('conteudoPrincipal').style.display = 'block';
         }, 300);
     }, 500);
 };
