@@ -12,7 +12,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="icone-192.png">
     <link rel="apple-touch-icon" href="icone-192.png">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', Arial, sans-serif; }
+        { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', Arial, sans-serif; }
         body { background: #E3F2FD; text-align: center; padding: 15px; }
         body.dark-mode { background: #121212; color: #FFF; }
         body.dark-mode .box, body.dark-mode .modal { background: #1E1E1E; color: #FFF; border-color: #333; }
@@ -178,7 +178,7 @@
 <div id="tabelaSimulacaoModal" class="modal">
     <h3>📊 TABELA DE SIMULAÇÃO DE PREÇOS (até 80 km)</h3>
     <div style="overflow-x:auto;">
-        <table class="tabela-simulacao" id="corpoTabelaSimulacao">
+        <table class="tabela-simulacao">
             <thead>
                 <tr>
                     <th>KM</th>
@@ -268,6 +268,7 @@
     <button class="fechar-btn" onclick="fecharModal('telaDadosMotorista')">❌ Fechar</button>
 </div>
 
+<!-- CONTINUA NA PARTE 2 — O SCRIPT VEM AQUI ABAIXO -->
 <script>
 const tarifas = {
     dia: { bandeira: 2.50, km: 1.15, minimo: 0.00 },
@@ -674,43 +675,39 @@ function gerarCodigoPix() {
 function copiarCodigoPixModal() {
     const elCodigo = document.getElementById('campoCodigoPixModal');
     if (!elCodigo) return;
-    elCod
     elCodigo.value = pixKey;
     elCodigo.select();
     try {
-        document.execCommand('copy');
-        alert('✅ Código copiado!');
-    } catch (e) {
-        alert('Não foi possível copiar. Selecione e copie manualmente.');
-    }
+        document.exec
+  document.execCommand('copy');
+  alert('✅ Código copiado!');
+} catch (e) {
+  alert('Não foi possível copiar. Selecione e copie manualmente.');
+}
 }
 
 window.onload = function() {
-    historicoCorridas = JSON.parse(localStorage.getItem('historicoCorridas') || '[]');
-    const tarifasSalvas = localStorage.getItem('tarifas');
-    if (tarifasSalvas) {
-        const dados = JSON.parse(tarifasSalvas);
-        if (dados.dia) tarifas.dia = dados.dia;
-        if (dados.noite) tarifas.noite = dados.noite;
-        if (dados.fimSemana) tarifas.fimSemana = dados.fimSemana;
-        if (dados.interDia) tarifas.interDia = dados.interDia;
-        if (dados.interNoite) tarifas.interNoite = dados.interNoite;
-    }
-    carregarDadosMotorista();
-    atualizarListaCorridas();
-    atualizarTabelaTarifasUI();
-    atualizarTabelaSimulacao();
-    definirTarifaPorHorario();
+  // 🔧 CORREÇÃO: Apaga tarifas antigas com valores errados
+  localStorage.removeItem('tarifas');
+  
+  historicoCorridas = JSON.parse(localStorage.getItem('historicoCorridas') || '[]');
+  
+  // Não carrega tarifas salvas — usa os valores padrão do código
+  carregarDadosMotorista();
+  atualizarListaCorridas();
+  atualizarTabelaTarifasUI();
+  atualizarTabelaSimulacao();
+  definirTarifaPorHorario();
 
+  setTimeout(() => {
+    const carregando = document.getElementById('telaCarregamento');
+    const conteudo = document.getElementById('conteudoPrincipal');
+    if (carregando) carregando.style.opacity = '0';
     setTimeout(() => {
-        const carregando = document.getElementById('telaCarregamento');
-        const conteudo = document.getElementById('conteudoPrincipal');
-        if (carregando) carregando.style.opacity = '0';
-        setTimeout(() => {
-            if (carregando) carregando.style.display = 'none';
-            if (conteudo) conteudo.style.display = 'block';
-        }, 300);
-    }, 800);
+      if (carregando) carregando.style.display = 'none';
+      if (conteudo) conteudo.style.display = 'block';
+    }, 300);
+  }, 800);
 };
 </script>
 
