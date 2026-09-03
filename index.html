@@ -280,6 +280,7 @@
     </div>
     <button class="fechar-btn" onclick="fecharModal('telaDadosMotorista')">❌ Fechar</button>
 </div>
+
 <script>
 const tarifas = {
     dia: { bandeira: 2.50, km: 1.15, minimo: 0.00 },
@@ -414,13 +415,15 @@ setInterval(definirTarifaPorHorario, 60000);
 
 function calcularValor(distancia, tarifa) {
     let valor = tarifa.bandeira + (distancia * tarifa.km);
-    return tarifa.minimo > 0 && valor < tarifa.minimo ? tarifa.minimo : valor;
+    if (tarifa.minimo > 0 && valor < tarifa.minimo) {
+        valor = tarifa.minimo;
+    }
+    return valor;
 }
 
 function formatarValor(valor) {
     return 'R$ ' + valor.toFixed(2).replace('.', ',');
 }
-
 
 function formatarTempo(segundos) {
     const h = Math.floor(segundos / 3600).toString().padStart(2, '0');
@@ -552,7 +555,7 @@ async function iniciarCorrida() {
                         ultimaPosicao.coords.latitude, ultimaPosicao.coords.longitude,
                         pos.coords.latitude, pos.coords.longitude
                     );
-                    if (dist > 0.005 && dist < 0.05) {
+                    if (dist > 0.02 && dist < 0.10) {
                         distanciaPercorrida += dist;
                         atualizarValorTaximetro();
                     }
@@ -652,26 +655,25 @@ function atualizarTabelaTarifasUI() {
     setText('tabInterDiaBandeira', tarifas.interDia.bandeira); setText('tabInterDiaKm', tarifas.interDia.km); setText('tabInterDiaMinimo', tarifas.interDia.minimo);
     setText('tabInterNoiteBandeira', tarifas.interNoite.bandeira); setText('tabInterNoiteKm', tarifas.interNoite.km); setText('tabInterNoiteMinimo', tarifas.interNoite.minimo);
 }
+
 function preencherCamposTarifas() {
     const el = (id) => document.getElementById(id);
     if (el('diaBandeira')) el('diaBandeira').value = tarifas.dia.bandeira;
     if (el('diaKm')) el('diaKm').value = tarifas.dia.km;
-    if (el('diaMinimo')) el('diaMinimo').value = tarifas.dia.minimo; // ← faltava garantir
+    if (el('diaMinimo')) el('diaMinimo').value = tarifas.dia.minimo;
     if (el('noiteBandeira')) el('noiteBandeira').value = tarifas.noite.bandeira;
     if (el('noiteKm')) el('noiteKm').value = tarifas.noite.km;
-    if (el('noiteMinimo')) el('noiteMinimo').value = tarifas.noite.minimo; // ← faltava garantir
+    if (el('noiteMinimo')) el('noiteMinimo').value = tarifas.noite.minimo;
     if (el('fimSemanaBandeira')) el('fimSemanaBandeira').value = tarifas.fimSemana.bandeira;
     if (el('fimSemanaKm')) el('fimSemanaKm').value = tarifas.fimSemana.km;
-    if (el('fimSemanaMinimo')) el('fimSemanaMinimo').value = tarifas.fimSemana.minimo; // ← faltava garantir
+    if (el('fimSemanaMinimo')) el('fimSemanaMinimo').value = tarifas.fimSemana.minimo;
     if (el('interDiaBandeira')) el('interDiaBandeira').value = tarifas.interDia.bandeira;
     if (el('interDiaKm')) el('interDiaKm').value = tarifas.interDia.km;
-    if (el('interDiaMinimo')) el('interDiaMinimo').value = tarifas.interDia.minimo; // ← faltava garantir
+    if (el('interDiaMinimo')) el('interDiaMinimo').value = tarifas.interDia.minimo;
     if (el('interNoiteBandeira')) el('interNoiteBandeira').value = tarifas.interNoite.bandeira;
     if (el('interNoiteKm')) el('interNoiteKm').value = tarifas.interNoite.km;
-    if (el('interNoiteMinimo')) el('interNoiteMinimo').value = tarifas.interNoite.minimo; // ← faltava garantir
+    if (el('interNoiteMinimo')) el('interNoiteMinimo').value = tarifas.interNoite.minimo;
 }
-
-
 
 function salvarTodasTarifas() {
     const el = (id) => document.getElementById(id);
@@ -685,8 +687,7 @@ function salvarTodasTarifas() {
 
     tarifas.fimSemana.bandeira = parseFloat(el('fimSemanaBandeira').value) || 0;
     tarifas.fimSemana.km = parseFloat(el('fimSemanaKm').value) || 0;
-    tarifas.fim
-Semana.minimo = parseFloat(el('fimSemanaMinimo').value) || 0;
+    tarifas.fimSemana.minimo = parseFloat(el('fimSemanaMinimo').value) || 0;
 
     tarifas.interDia.bandeira = parseFloat(el('interDiaBandeira').value) || 0;
     tarifas.interDia.km = parseFloat(el('interDiaKm').value) || 0;
@@ -710,94 +711,75 @@ function carregarTarifasSalvas() {
     if (salvas) {
         try {
             const dados = JSON.parse(salvas);
-            if (dados.dia) {
-                tarifas.dia.bandeira = dados.dia.bandeira;
-                tarifas.dia.km = dados.dia.km;
-                tarifas.dia.minimo = dados.dia.minimo || 0; // ← faltava isso
-            }
-            if (dados.noite) {
-                tarifas.noite.bandeira = dados.noite.bandeira;
-                tarifas.noite.km = dados.noite.km;
-                tarifas.noite.minimo = dados.noite.minimo || 0; // ← faltava isso
-            }
-            if (dados.fimSemana) {
-                tarifas.fimSemana.bandeira = dados.fimSemana.bandeira;
-                tarifas.fimSemana.km = dados.fimSemana.km;
-                tarifas.fimSemana.minimo = dados.fimSemana.minimo || 0; // ← faltava isso
-            }
-            if (dados.interDia) {
-                tarifas.interDia.bandeira = dados.interDia.bandeira;
-                tarifas.interDia.km = dados.interDia.km;
-                tarifas.interDia.minimo = dados.interDia.minimo || 0; // ← faltava isso
-            }
-            if (dados.interNoite) {
-                tarifas.interNoite.bandeira = dados.interNoite.bandeira;
-                tarifas.interNoite.km = dados.interNoite.km;
-                tarifas.interNoite.minimo = dados.interNoite.minimo || 0; // ← faltava isso
-            }
-        } catch(e) {
+            Object.assign(tarifas, dados);
+            atualizarTabelaTarifasUI();
+            definirTarifaPorHorario();
+            atualizarTabelaSimulacao();
+        } catch (e) {
             console.log('Erro ao carregar tarifas:', e);
         }
     }
-    atualizarTabelaTarifasUI();
-    definirTarifaPorHorario();
-    atualizarTabelaSimulacao();
-}
-
-
-function abrirRotaGoogleMaps() {
-    const origem = document.getElementById('campoOrigem').value.trim();
-    const destino = document.getElementById('campoDestino').value.trim();
-    if (!origem || !destino) {
-        alert('Digite a origem e o destino!');
-        return;
-    }
-    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origem)}&destination=${encodeURIComponent(destino)}`;
-    window.open(url, '_blank');
-}
-
-function compartilharWhatsapp() {
-    const origem = document.getElementById('campoOrigem').value.trim() || '-';
-    const destino = document.getElementById('campoDestino').value.trim() || '-';
-    const valorFinalEl = document.getElementById('valorFinalMenor');
-    const valorTexto = valorFinalEl ? valorFinalEl.innerText : 'A calcular';
-    const msg = `🏍️ Corrida de Moto Táxi\nOrigem: ${origem}\nDestino: ${destino}\nValor: ${valorTexto}`;
-    const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-    window.open(url, '_blank');
 }
 
 function gerarCodigoPix() {
-    if (!pixKey) {
+    if (!pixKey || pixKey.trim() === '') {
         alert('Cadastre sua chave Pix em "Meus Dados" primeiro!');
         abrirModal('telaDadosMotorista');
         return;
     }
     const valorFinalEl = document.getElementById('valorFinalMenor');
-    const valorTexto = valorFinalEl ? valorFinalEl.innerText.replace('R$ ', '').replace(',', '.') : '0.00';
-    document.getElementById('pixValorDisplay').innerText = `R$ ${valorTexto.replace('.', ',')}`;
-    document.getElementById('campoCodigoPixModal').value = `Chave Pix: ${pixKey}\nValor: R$ ${valorTexto.replace('.', ',')}\nNome: ${nomeMotorista}\nCidade: ${cidadeMotorista}`;
-    abrirModal('pixModal');
+    if (!valorFinalEl || !valorFinalEl.innerText) return;
+    const valorStr = valorFinalEl.innerText.replace('R$', '').replace(',', '.').trim();
+    const valor = parseFloat(valorStr);
+    if (!valor || valor <= 0) { alert('Encerre uma corrida primeiro!'); return; }
+
+    const descricao = document.getElementById('campoDestino') ? document.getElementById('campoDestino').value || 'Corrida de Moto' : 'Corrida de Moto';
+    const cidadePagador = cidadeMotorista || 'Teresina';
+    const nomePagador = nomeMotorista || 'Motorista';
+
+    const codigoPix = `00020126580014br.gov.bcb.pix01${pixKey.length.toString().padStart(2,'0')}${pixKey}02${descricao.length.toString().padStart(2,'0')}${descricao}5204000053039865802BR59${nomePagador.length.toString().padStart(2,'0')}${nomePagador}60${cidadePagador.length.toString().padStart(2,'0')}${cidadePagador}62070503***6304`;
+
+    const pixModal = document.getElementById('pixModal');
+    const campoCodigo = document.getElementById('campoCodigoPixModal');
+    const pixValorDisplay = document.getElementById('pixValorDisplay');
+    if (campoCodigo) campoCodigo.value = codigoPix;
+    if (pixValorDisplay) pixValorDisplay.innerText = valorFinalEl.innerText;
+    if (pixModal) pixModal.style.display = 'block';
+    document.getElementById('fundoModal').style.display = 'block';
 }
 
 function copiarCodigoPixModal() {
     const campo = document.getElementById('campoCodigoPixModal');
-    campo.select();
-    document.execCommand('copy');
-    alert('✅ Código copiado!');
+    if (!campo) return;
+    campo.select(); campo.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(campo.value)
+        .then(() => alert('✅ Código Pix copiado!'))
+        .catch(() => alert('Não foi possível copiar — selecione e copie manualmente.'));
 }
 
-window.addEventListener('load', () => {
-    carregarTarifasSalvas();
-    carregarDadosMotorista();
-    const historicoSalvo = localStorage.getItem('historicoCorridas');
-    if (historicoSalvo) {
-        try {
-            historicoCorridas = JSON.parse(historicoSalvo);
-            atualizarListaCorridas();
-        } catch(e) {
-            historicoCorridas = [];
-        }
-    }
+function abrirRotaGoogleMaps() {
+    const origem = document.getElementById('campoOrigem') ? document.getElementById('campoOrigem').value.trim() : '';
+    const destino = document.getElementById('campoDestino') ? document.getElementById('campoDestino').value.trim() : '';
+    if (!origem || !destino) { alert('Digite a Origem e o Destino!'); return; }
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origem)}&destination=${encodeURIComponent(destino)}`;
+    window.open(url, '_blank');
+}
+
+function compartilharWhatsapp() {
+    const origem = document.getElementById('campoOrigem') ? document.getElementById('campoOrigem').value || '-' : '-';
+    const destino = document.getElementById('campoDestino') ? document.getElementById('campoDestino').value || '-' : '-';
+    const valorMaps = document.getElementById('valorMaps') ? document.getElementById('valorMaps').innerText : 'R$ 0,00';
+    const valorTax = document.getElementById('valorTaximetro') ? document.getElementById('valorTaximetro').innerText : 'R$ 0,00';
+    const valorFinal = document.getElementById('caixaValorFinal') && document.getElementById('caixaValorFinal').style.display !== 'none'
+        ? document.getElementById('valorFinalMenor').innerText : 'Aguardando finalização';
+
+    const mensagem = `🏍️ Corrida de Moto\n📍 Origem: ${origem}\n📍 Destino: ${destino}\n📏 Distância: ${kmGoogleMaps.toFixed(1).replace('.',',')} km\n📱 Maps: ${valorMaps}\n📱 Taxímetro: ${valorTax}\n💵 Valor final: ${valorFinal}\n${nomeMotorista} — ${cidadeMotorista}`;
+
+    const url = `https://wa.me/${whatsApp || ''}?text=${encodeURIComponent(mensagem)}`;
+    window.open(url, '_blank');
+}
+
+window.onload = function() {
     setTimeout(() => {
         document.getElementById('telaCarregamento').style.opacity = '0';
         setTimeout(() => {
@@ -805,8 +787,22 @@ window.addEventListener('load', () => {
             document.getElementById('conteudoPrincipal').style.display = 'block';
         }, 300);
     }, 800);
-});
-</script>
 
+    carregarTarifasSalvas();
+    carregarDadosMotorista();
+    definirTarifaPorHorario();
+    atualizarTabelaSimulacao();
+    atualizarTabelaTarifasUI();
+
+    const historicoSalvo = localStorage.getItem('historicoCorridas');
+    if (historicoSalvo) {
+        try { historicoCorridas = JSON.parse(historicoSalvo); atualizarListaCorridas(); }
+        catch(e) { historicoCorridas = []; }
+    }
+
+    const btnPix = document.getElementById('btnPix');
+    if (btnPix) btnPix.disabled = !pixKey;
+};
+</script>
 </body>
 </html>
