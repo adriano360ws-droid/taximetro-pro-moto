@@ -555,7 +555,7 @@ async function iniciarCorrida() {
                         ultimaPosicao.coords.latitude, ultimaPosicao.coords.longitude,
                         pos.coords.latitude, pos.coords.longitude
                     );
-                    if (dist > 0.02 && dist < 0.10) {
+                    if (dist > 0.10 && dist < 0.20) {
                         distanciaPercorrida += dist;
                         atualizarValorTaximetro();
                     }
