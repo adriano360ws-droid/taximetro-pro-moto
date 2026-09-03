@@ -421,6 +421,7 @@ function formatarValor(valor) {
     return 'R$ ' + valor.toFixed(2).replace('.', ',');
 }
 
+
 function formatarTempo(segundos) {
     const h = Math.floor(segundos / 3600).toString().padStart(2, '0');
     const m = Math.floor((segundos % 3600) / 60).toString().padStart(2, '0');
@@ -651,25 +652,26 @@ function atualizarTabelaTarifasUI() {
     setText('tabInterDiaBandeira', tarifas.interDia.bandeira); setText('tabInterDiaKm', tarifas.interDia.km); setText('tabInterDiaMinimo', tarifas.interDia.minimo);
     setText('tabInterNoiteBandeira', tarifas.interNoite.bandeira); setText('tabInterNoiteKm', tarifas.interNoite.km); setText('tabInterNoiteMinimo', tarifas.interNoite.minimo);
 }
-
 function preencherCamposTarifas() {
     const el = (id) => document.getElementById(id);
     if (el('diaBandeira')) el('diaBandeira').value = tarifas.dia.bandeira;
     if (el('diaKm')) el('diaKm').value = tarifas.dia.km;
-    if (el('diaMinimo')) el('diaMinimo').value = tarifas.dia.minimo;
+    if (el('diaMinimo')) el('diaMinimo').value = tarifas.dia.minimo; // ← faltava garantir
     if (el('noiteBandeira')) el('noiteBandeira').value = tarifas.noite.bandeira;
     if (el('noiteKm')) el('noiteKm').value = tarifas.noite.km;
-    if (el('noiteMinimo')) el('noiteMinimo').value = tarifas.noite.minimo;
+    if (el('noiteMinimo')) el('noiteMinimo').value = tarifas.noite.minimo; // ← faltava garantir
     if (el('fimSemanaBandeira')) el('fimSemanaBandeira').value = tarifas.fimSemana.bandeira;
     if (el('fimSemanaKm')) el('fimSemanaKm').value = tarifas.fimSemana.km;
-    if (el('fimSemanaMinimo')) el('fimSemanaMinimo').value = tarifas.fimSemana.minimo;
+    if (el('fimSemanaMinimo')) el('fimSemanaMinimo').value = tarifas.fimSemana.minimo; // ← faltava garantir
     if (el('interDiaBandeira')) el('interDiaBandeira').value = tarifas.interDia.bandeira;
     if (el('interDiaKm')) el('interDiaKm').value = tarifas.interDia.km;
-    if (el('interDiaMinimo')) el('interDiaMinimo').value = tarifas.interDia.minimo;
+    if (el('interDiaMinimo')) el('interDiaMinimo').value = tarifas.interDia.minimo; // ← faltava garantir
     if (el('interNoiteBandeira')) el('interNoiteBandeira').value = tarifas.interNoite.bandeira;
     if (el('interNoiteKm')) el('interNoiteKm').value = tarifas.interNoite.km;
-    if (el('interNoiteMinimo')) el('interNoiteMinimo').value = tarifas.interNoite.minimo;
+    if (el('interNoiteMinimo')) el('interNoiteMinimo').value = tarifas.interNoite.minimo; // ← faltava garantir
 }
+
+
 
 function salvarTodasTarifas() {
     const el = (id) => document.getElementById(id);
@@ -708,11 +710,31 @@ function carregarTarifasSalvas() {
     if (salvas) {
         try {
             const dados = JSON.parse(salvas);
-            if (dados.dia) tarifas.dia = dados.dia;
-            if (dados.noite) tarifas.noite = dados.noite;
-            if (dados.fimSemana) tarifas.fimSemana = dados.fimSemana;
-            if (dados.interDia) tarifas.interDia = dados.interDia;
-            if (dados.interNoite) tarifas.interNoite = dados.interNoite;
+            if (dados.dia) {
+                tarifas.dia.bandeira = dados.dia.bandeira;
+                tarifas.dia.km = dados.dia.km;
+                tarifas.dia.minimo = dados.dia.minimo || 0; // ← faltava isso
+            }
+            if (dados.noite) {
+                tarifas.noite.bandeira = dados.noite.bandeira;
+                tarifas.noite.km = dados.noite.km;
+                tarifas.noite.minimo = dados.noite.minimo || 0; // ← faltava isso
+            }
+            if (dados.fimSemana) {
+                tarifas.fimSemana.bandeira = dados.fimSemana.bandeira;
+                tarifas.fimSemana.km = dados.fimSemana.km;
+                tarifas.fimSemana.minimo = dados.fimSemana.minimo || 0; // ← faltava isso
+            }
+            if (dados.interDia) {
+                tarifas.interDia.bandeira = dados.interDia.bandeira;
+                tarifas.interDia.km = dados.interDia.km;
+                tarifas.interDia.minimo = dados.interDia.minimo || 0; // ← faltava isso
+            }
+            if (dados.interNoite) {
+                tarifas.interNoite.bandeira = dados.interNoite.bandeira;
+                tarifas.interNoite.km = dados.interNoite.km;
+                tarifas.interNoite.minimo = dados.interNoite.minimo || 0; // ← faltava isso
+            }
         } catch(e) {
             console.log('Erro ao carregar tarifas:', e);
         }
@@ -721,6 +743,7 @@ function carregarTarifasSalvas() {
     definirTarifaPorHorario();
     atualizarTabelaSimulacao();
 }
+
 
 function abrirRotaGoogleMaps() {
     const origem = document.getElementById('campoOrigem').value.trim();
