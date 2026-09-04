@@ -601,37 +601,45 @@ async function iniciarCorrida() {
     watchId = navigator.geolocation.watchPosition(
         (pos) => {
             const avisoGPS = document.getElementById('avisoGPS');
-            const acc = Number(pos.coords.accuracy || 9999);
+            const acc = Number(pos.coords.accuracy);
             const agora = Date.now();
-            const anterior = ultimaPosicao;
 
-            if (acc > 35) {
+            // Celulares em tela dividida podem informar precisão acima de 35 m.
+            // Aceitamos até 80 m e filtramos pelos demais critérios.
+            if (!Number.isFinite(acc) || acc <= 0 || acc > 80) {
+                gpsTeveBaixaPrecisao = true;
                 if (avisoGPS) {
-                    avisoGPS.innerText = `⚠️ GPS com baixa precisão (${Math.round(acc)} m). Aguardando sinal melhor...`;
+                    avisoGPS.innerText = `⚠️ GPS com baixa precisão (${Math.round(acc || 0)} m). Aguardando posição melhor...`;
                     avisoGPS.style.display = 'block';
                 }
                 return;
             }
+
+            gpsAtualizacoesValidas++;
 
             if (avisoGPS) {
                 avisoGPS.innerText = `📡 GPS ativo • precisão ${Math.round(acc)} m`;
                 avisoGPS.style.display = 'block';
             }
 
-            if (anterior) {
+            if (ultimaPosicao) {
                 const dist = calcularDistanciaEntre(
-                    anterior.coords.latitude, anterior.coords.longitude,
+                    ultimaPosicao.coords.latitude, ultimaPosicao.coords.longitude,
                     pos.coords.latitude, pos.coords.longitude
                 );
                 const tempoEntre = Math.max(1, (agora - ultimaAtualizacaoGPS) / 1000);
+                gpsMaiorIntervaloMs = Math.max(gpsMaiorIntervaloMs, agora - ultimaAtualizacaoGPS);
                 const velocidadeInstantanea = (dist / tempoEntre) * 3600;
 
-                if (dist >= 0.006 && velocidadeInstantanea <= 140) {
+                // Movimento mínimo de 3 metros. Rejeita saltos incompatíveis
+                // com uma motocicleta.
+                if (dist >= 0.003 && velocidadeInstantanea <= 160) {
                     distanciaPercorrida += dist;
                     atualizarValorTaximetro();
                 }
             }
 
+            // Só usa posições que passaram pelo filtro como referência.
             ultimaPosicao = pos;
             ultimaAtualizacaoGPS = agora;
         },
@@ -654,42 +662,6 @@ async function iniciarCorrida() {
 }
 
 
-function atualizarVelocidadeMedia() {
-    const el = document.getElementById('velocidadeMedia');
-    if (!el) return;
-
-    if (!inicioCorrida || distanciaPercorrida <= 0) {
-        el.textContent = '0,0 km/h';
-        return;
-    }
-
-    const horas = (Date.now() - inicioCorrida) / 3600000;
-    const media = horas > 0 ? distanciaPercorrida / horas : 0;
-    el.textContent = `${media.toFixed(1).replace('.', ',')} km/h`;
-}
-
-function atualizarTempoRestante() {
-    const el = document.getElementById('tempoRestante');
-    if (!el) return;
-
-    const kmRestantes = Math.max(0, distanciaTotal - distanciaPercorrida);
-    if (kmRestantes <= 0.001) {
-        el.textContent = 'Chegada';
-        return;
-    }
-
-    const horas = (Date.now() - inicioCorrida) / 3600000;
-    const media = horas > 0 ? distanciaPercorrida / horas : 0;
-
-    if (media < 3) {
-        el.textContent = 'Calculando...';
-        return;
-    }
-
-    const minutos = Math.round((kmRestantes / media) * 60);
-    el.textContent = `${minutos} min`;
-}
-
 function pararCorrida() {
     if (!corridaAtiva) return;
     corridaAtiva = false;
@@ -701,7 +673,7 @@ function pararCorrida() {
     const valorTax = calcularValor(distanciaPercorrida, tarifaFinal);
     const gpsConfiavel = gpsAtualizacoesValidas >= 2 && !gpsTeveBaixaPrecisao && gpsMaiorIntervaloMs <= 120000;
     const fonteValor = gpsConfiavel ? 'GPS' : 'MAPS_FALLBACK';
-    valorFinal = gpsConfiavel ? valorTax : valorMaps;
+    const valorFinal = gpsConfiavel ? valorTax : valorMaps;
     const valorEconomia = Math.max(0, valorMaps - valorTax);
 
     const btnIniciar = document.getElementById('btnIniciar');
@@ -732,10 +704,10 @@ function pararCorrida() {
         caixaEconomia.style.display = 'none';
     }
 
-    salvarCorridaNoHistorico(valorMaps, valorTax, valorFinal, valorEconomia);
+    salvarCorridaNoHistorico(valorMaps, valorTax, valorFinal, valorEconomia, fonteValor);
 }
 
-function salvarCorridaNoHistorico(valorMaps, valorTax, valorFinal, valorEconomia) {
+function salvarCorridaNoHistorico(valorMaps, valorTax, valorFinal, valorEconomia, fonteValor) {
     const corrida = {
         data: new Date().toLocaleString('pt-BR'),
         dataISO: new Date().toISOString().slice(0,10),
@@ -948,10 +920,11 @@ function gerarCodigoPix() {
     const tarifaParaPix = corridaAtiva ? tarifaCorrida : tarifaAtual;
     const valorMaps = calcularValor(kmGoogleMaps, tarifaParaPix);
     const valorTax = calcularValor(distanciaPercorrida, tarifaParaPix);
-    const valorFinal = Math.min(valorMaps, valorTax);
-    const payload = montarPayloadPix(valorFinal);
+    const gpsConfiavel = gpsAtualizacoesValidas >= 2 && !gpsTeveBaixaPrecisao && gpsMaiorIntervaloMs <= 120000;
+    const valorFinalPix = corridaAtiva ? valorTax : (gpsConfiavel ? valorTax : valorMaps);
+    const payload = montarPayloadPix(valorFinalPix);
 
-    document.getElementById('pixValorDisplay').innerText = formatarValor(valorFinal);
+    document.getElementById('pixValorDisplay').innerText = formatarValor(valorFinalPix);
     document.getElementById('campoCodigoPixModal').value = payload;
     atualizarQRCodePix(payload);
     abrirModal('pixModal');
