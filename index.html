@@ -31,6 +31,7 @@
         .box-taximetro { border: 2px solid #00B050; background: #F0FFF4; }
         .box-final { border: 3px solid #FF9800; background: #FFF8E1; }
         .box-economia { border: 2px solid #4CAF50; background: #E8F5E9; margin-top: 8px; }
+        .aviso-gps { background: #FFF3E0; border: 2px solid #FF9800; color: #E65100; padding: 10px; border-radius: 12px; margin: 10px 0; font-size: 0.95em; display: none; }
         
         .valor-maps { 
             font-size: 3.2em; 
@@ -144,6 +145,8 @@
             <strong>Destino:</strong> <span id="exibeDestino">-</span>
         </div>
     </div>
+
+    <div class="aviso-gps" id="avisoGPS">⚠️ Aguardando sinal do GPS... Mantenha o celular com sinal de localização ligado.</div>
 
     <div class="box box-maps">
         <div class="label-valor">📍 Valor Estimado (Google Maps)</div>
@@ -316,6 +319,7 @@ let intermunicipalAtivo = false;
 let pixKey = "", nomeMotorista = "", cidadeMotorista = "", whatsApp = "";
 let historicoCorridas = [];
 let velocidadeMediaKmPorHora = 0;
+let ultimaAtualizacaoGPS = 0;
 
 function alternarModoEscuro() {
     document.body.classList.toggle('dark-mode');
@@ -543,14 +547,20 @@ async function iniciarCorrida() {
     tempoTotalSegundos = 0;
     velocidadeMediaKmPorHora = 0;
     ultimaPosicao = null;
+    ultimaAtualizacaoGPS = Date.now();
+    
     const btnIniciar = document.getElementById('btnIniciar');
     const btnParar = document.getElementById('btnParar');
     const caixaFinal = document.getElementById('caixaValorFinal');
     const caixaEconomia = document.getElementById('caixaEconomia');
+    const avisoGPS = document.getElementById('avisoGPS');
+    
     if (btnIniciar) btnIniciar.disabled = true;
     if (btnParar) btnParar.disabled = false;
     if (caixaFinal) caixaFinal.style.display = 'none';
     if (caixaEconomia) caixaEconomia.style.display = 'none';
+    if (avisoGPS) avisoGPS.style.display = 'block';
+    
     await definirTarifaPorHorario();
     atualizarValorTaximetro();
 
@@ -563,25 +573,47 @@ async function iniciarCorrida() {
         }
     }, 1000);
 
-    if (navigator.geolocation) {
-        watchId = navigator.geolocation.watchPosition(
-            (pos) => {
-                if (ultimaPosicao) {
-                    const dist = calcularDistanciaEntre(
-                        ultimaPosicao.coords.latitude, ultimaPosicao.coords.longitude,
-                        pos.coords.latitude, pos.coords.longitude
-                    );
-                    if (dist > 0.10 && dist < 0.20) {
-                        distanciaPercorrida += dist;
-                        atualizarValorTaximetro();
-                    }
-                }
-                ultimaPosicao = pos;
-            },
-            (erro) => console.log('GPS Erro:', erro),
-            { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
-        );
+    if (!navigator.geolocation) {
+        alert('❌ Seu navegador não suporta GPS! Use o Chrome no celular.');
+        pararCorrida();
+        return;
     }
+
+    watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+            const avisoGPS = document.getElementById('avisoGPS');
+            if (avisoGPS) avisoGPS.style.display = 'none';
+            
+            if (ultimaPosicao) {
+                const dist = calcularDistanciaEntre(
+                    ultimaPosicao.coords.latitude, ultimaPosicao.coords.longitude,
+                    pos.coords.latitude, pos.coords.longitude
+                );
+                // ✅ CORREÇÃO: Aceita distâncias razoáveis, ignora só saltos gigantes
+                if (dist > 0.005 && dist < 1.00) {
+                    distanciaPercorrida += dist;
+                    atualizarValorTaximetro();
+                }
+            }
+            ultimaPosicao = pos;
+            ultimaAtualizacaoGPS = Date.now();
+        },
+        (erro) => {
+            console.log('GPS Erro:', erro.code, erro.message);
+            const avisoGPS = document.getElementById('avisoGPS');
+            if (avisoGPS) {
+                if (erro.code === 1) avisoGPS.innerText = '⚠️ Permissão de localização negada! Ative nas configurações do navegador.';
+                else if (erro.code === 2) avisoGPS.innerText = '⚠️ Sinal de GPS indisponível — verifique se o GPS está ligado.';
+                else avisoGPS.innerText = '⚠️ Erro no GPS: ' + erro.message;
+                avisoGPS.style.display = 'block';
+            }
+        },
+        { 
+            enableHighAccuracy: true, 
+            maximumAge: 5000,    // Aceita posição de até 5 segundos atrás
+            timeout: 10000       // Espera até 10s por uma posição
+        }
+    );
 }
 
 function pararCorrida() {
@@ -604,16 +636,18 @@ function pararCorrida() {
     const caixaFinal = document.getElementById('caixaValorFinal');
     const caixaEconomia = document.getElementById('caixaEconomia');
     const valorEconomiaEl = document.getElementById('valorEconomia');
+    const avisoGPS = document.getElementById('avisoGPS');
 
     if (btnIniciar) btnIniciar.disabled = false;
     if (btnParar) btnParar.disabled = true;
     if (btnPix) btnPix.disabled = !pixKey;
+    if (avisoGPS) avisoGPS.style.display = 'none';
+    
     if (finalMaps) finalMaps.innerText = formatarValor(valorMaps) + ' (' + kmGoogleMaps.toFixed(1).replace('.', ',') + ' km)';
     if (finalTax) finalTax.innerText = formatarValor(valorTax) + ' (' + distanciaPercorrida.toFixed(1).replace('.', ',') + ' km)';
     if (valorFinalEl) valorFinalEl.innerText = valorFinal.toFixed(2).replace('.', ',');
     if (caixaFinal) caixaFinal.style.display = 'block';
     
-    // Mostra a economia SOMENTE se o taxímetro foi menor que o Maps
     if (caixaEconomia && valorEconomia > 0) {
         caixaEconomia.style.display = 'block';
         if (valorEconomiaEl) valorEconomiaEl.innerText = valorEconomia.toFixed(2).replace('.', ',');
@@ -670,8 +704,9 @@ function limparCorridasHoje() {
         atualizarListaCorridas();
     }
 }
-function limparTodoHistorico() {
-    if (confirm('Apagar TODO o histórico?')) {
+function limp
+arCorridasHoje() {
+    if (confirm('Apagar TODO o histórico de corridas?')) {
         historicoCorridas = [];
         localStorage.removeItem('historicoCorridas');
         atualizarListaCorridas();
@@ -699,8 +734,7 @@ function preencherCamposTarifas() {
     if (el('fimSemanaKm')) el('fimSemanaKm').value = tarifas.fimSemana.km;
     if (el('fimSemanaMinimo')) el('fimSemanaMinimo').value = tarifas.fimSemana.minimo;
     if (el('interDiaBandeira')) el('interDiaBandeira').value = tarifas.interDia.bandeira;
-    if (el('interDiaKm')) el('interDiaKm').value = tarifas.interDia
-.value = tarifas.interDia.km;
+    if (el('interDiaKm')) el('interDiaKm').value = tarifas.interDia.km;
     if (el('interDiaMinimo')) el('interDiaMinimo').value = tarifas.interDia.minimo;
     if (el('interNoiteBandeira')) el('interNoiteBandeira').value = tarifas.interNoite.bandeira;
     if (el('interNoiteKm')) el('interNoiteKm').value = tarifas.interNoite.km;
@@ -772,7 +806,7 @@ function copiarCodigoPixModal() {
     const campo = document.getElementById('campoCodigoPixModal');
     campo.select();
     document.execCommand('copy');
-    alert('✅ Copiado!');
+    alert('✅ Código copiado!');
 }
 
 window.onload = function() {
@@ -803,3 +837,4 @@ window.onload = function() {
 </script>
 </body>
 </html>
+t
