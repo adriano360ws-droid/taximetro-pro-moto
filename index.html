@@ -229,8 +229,12 @@
 <div id="pixModal" class="modal">
     <h3>💳 PAGAMENTO PIX</h3>
     <p style="text-align:center; font-size:1.2em;">Valor: <span id="pixValorDisplay">R$ 0,00</span></p>
-    <textarea id="campoCodigoPixModal" readonly style="height:80px; width:100%;"></textarea>
-    <button class="btn-pix" onclick="copiarCodigoPixModal()">📋 COPIAR CÓDIGO PIX</button>
+    <div style="text-align:center; margin:10px 0;">
+        <img id="pixQRCode" alt="QR Code Pix" style="display:none; width:230px; max-width:90%; margin:auto; background:#fff; padding:8px; border-radius:8px;">
+        <p id="pixQrAviso" style="font-size:.85em; color:#666; margin:6px 0;">QR Code será carregado para pagamento.</p>
+    </div>
+    <textarea id="campoCodigoPixModal" readonly style="height:110px; width:100%;"></textarea>
+    <button class="btn-pix" onclick="copiarCodigoPixModal()">📋 COPIAR PIX COPIA E COLA</button>
     <button class="fechar-btn" onclick="fecharModal('pixModal')">❌ Fechar</button>
 </div>
 
@@ -308,6 +312,13 @@ const tarifas = {
 };
 
 let tarifaAtual = tarifas.dia;
+let tarifaCorrida = tarifas.dia;
+let gpsTeveBaixaPrecisao = false;
+let gpsAtualizacoesValidas = 0;
+let gpsUltimaAtualizacao = null;
+let gpsMaiorIntervaloMs = 0;
+let gpsUltimoPonto = null;
+
 let corridaAtiva = false;
 let tempoTotalSegundos = 0;
 let timerInterval = null;
@@ -342,10 +353,13 @@ function fecharTodosModais() {
 }
 
 function carregarDadosMotorista() {
-    pixKey = localStorage.getItem('pixKey') || "";
-    nomeMotorista = localStorage.getItem('nomeMotorista') || "Motorista";
-    cidadeMotorista = localStorage.getItem('cidadeMotorista') || "";
-    whatsApp = localStorage.getItem('whatsApp') || "";
+    pixKey = localStorage.getItem('pixKey') || '+5586981291332';
+    nomeMotorista = localStorage.getItem('nomeMotorista') || 'ADRIANO ALVES DE OLIVEIRA SOUZA';
+    cidadeMotorista = localStorage.getItem('cidadeMotorista') || 'TERESINA';
+    whatsApp = localStorage.getItem('whatsApp') || '';
+    if (!localStorage.getItem('pixKey')) localStorage.setItem('pixKey', pixKey);
+    if (!localStorage.getItem('nomeMotorista')) localStorage.setItem('nomeMotorista', nomeMotorista);
+    if (!localStorage.getItem('cidadeMotorista')) localStorage.setItem('cidadeMotorista', cidadeMotorista);
     const elPix = document.getElementById('inputPixKey');
     const elNome = document.getElementById('inputNomeMotorista');
     const elCidade = document.getElementById('inputCidadeMotorista');
@@ -519,7 +533,7 @@ function atualizarValorTaximetro() {
     const elKmTax = document.getElementById('kmTaximetro');
     const elValorTax = document.getElementById('valorTaximetro');
     if (elKmTax) elKmTax.innerText = distanciaPercorrida.toFixed(1).replace('.', ',') + ' km';
-    if (elValorTax) elValorTax.innerText = formatarValor(calcularValor(distanciaPercorrida, tarifaAtual));
+    if (elValorTax) elValorTax.innerText = formatarValor(calcularValor(distanciaPercorrida, corridaAtiva ? tarifaCorrida : tarifaAtual));
     atualizarKmRestante();
     
     if (tempoTotalSegundos > 60 && distanciaPercorrida > 0) {
@@ -543,6 +557,11 @@ async function iniciarCorrida() {
         return;
     }
     corridaAtiva = true;
+    gpsTeveBaixaPrecisao = false;
+    gpsAtualizacoesValidas = 0;
+    gpsUltimaAtualizacao = Date.now();
+    gpsMaiorIntervaloMs = 0;
+    gpsUltimoPonto = null;
     distanciaPercorrida = 0;
     tempoTotalSegundos = 0;
     velocidadeMediaKmPorHora = 0;
@@ -561,7 +580,8 @@ async function iniciarCorrida() {
     if (caixaEconomia) caixaEconomia.style.display = 'none';
     if (avisoGPS) avisoGPS.style.display = 'block';
     
-    await definirTarifaPorHorario();
+    definirTarifaPorHorario();
+    tarifaCorrida = { ...tarifaAtual };
     atualizarValorTaximetro();
 
     timerInterval = setInterval(() => {
@@ -578,25 +598,42 @@ async function iniciarCorrida() {
         pararCorrida();
         return;
     }
-
     watchId = navigator.geolocation.watchPosition(
         (pos) => {
             const avisoGPS = document.getElementById('avisoGPS');
-            if (avisoGPS) avisoGPS.style.display = 'none';
-            
-            if (ultimaPosicao) {
+            const acc = Number(pos.coords.accuracy || 9999);
+            const agora = Date.now();
+            const anterior = ultimaPosicao;
+
+            if (acc > 35) {
+                if (avisoGPS) {
+                    avisoGPS.innerText = `⚠️ GPS com baixa precisão (${Math.round(acc)} m). Aguardando sinal melhor...`;
+                    avisoGPS.style.display = 'block';
+                }
+                return;
+            }
+
+            if (avisoGPS) {
+                avisoGPS.innerText = `📡 GPS ativo • precisão ${Math.round(acc)} m`;
+                avisoGPS.style.display = 'block';
+            }
+
+            if (anterior) {
                 const dist = calcularDistanciaEntre(
-                    ultimaPosicao.coords.latitude, ultimaPosicao.coords.longitude,
+                    anterior.coords.latitude, anterior.coords.longitude,
                     pos.coords.latitude, pos.coords.longitude
                 );
-                // ✅ CORREÇÃO: Aceita distâncias razoáveis, ignora só saltos gigantes
-                if (dist > 0.005 && dist < 1.00) {
+                const tempoEntre = Math.max(1, (agora - ultimaAtualizacaoGPS) / 1000);
+                const velocidadeInstantanea = (dist / tempoEntre) * 3600;
+
+                if (dist >= 0.006 && velocidadeInstantanea <= 140) {
                     distanciaPercorrida += dist;
                     atualizarValorTaximetro();
                 }
             }
+
             ultimaPosicao = pos;
-            ultimaAtualizacaoGPS = Date.now();
+            ultimaAtualizacaoGPS = agora;
         },
         (erro) => {
             console.log('GPS Erro:', erro.code, erro.message);
@@ -610,10 +647,47 @@ async function iniciarCorrida() {
         },
         { 
             enableHighAccuracy: true, 
-            maximumAge: 5000,    // Aceita posição de até 5 segundos atrás
-            timeout: 10000       // Espera até 10s por uma posição
+            maximumAge: 5000,
+            timeout: 10000
         }
     );
+}
+
+
+function atualizarVelocidadeMedia() {
+    const el = document.getElementById('velocidadeMedia');
+    if (!el) return;
+
+    if (!inicioCorrida || distanciaPercorrida <= 0) {
+        el.textContent = '0,0 km/h';
+        return;
+    }
+
+    const horas = (Date.now() - inicioCorrida) / 3600000;
+    const media = horas > 0 ? distanciaPercorrida / horas : 0;
+    el.textContent = `${media.toFixed(1).replace('.', ',')} km/h`;
+}
+
+function atualizarTempoRestante() {
+    const el = document.getElementById('tempoRestante');
+    if (!el) return;
+
+    const kmRestantes = Math.max(0, distanciaTotal - distanciaPercorrida);
+    if (kmRestantes <= 0.001) {
+        el.textContent = 'Chegada';
+        return;
+    }
+
+    const horas = (Date.now() - inicioCorrida) / 3600000;
+    const media = horas > 0 ? distanciaPercorrida / horas : 0;
+
+    if (media < 3) {
+        el.textContent = 'Calculando...';
+        return;
+    }
+
+    const minutos = Math.round((kmRestantes / media) * 60);
+    el.textContent = `${minutos} min`;
 }
 
 function pararCorrida() {
@@ -622,9 +696,12 @@ function pararCorrida() {
     clearInterval(timerInterval);
     if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
 
-    const valorMaps = calcularValor(kmGoogleMaps, tarifaAtual);
-    const valorTax = calcularValor(distanciaPercorrida, tarifaAtual);
-    const valorFinal = Math.min(valorMaps, valorTax);
+    const tarifaFinal = { ...tarifaCorrida };
+    const valorMaps = calcularValor(kmGoogleMaps, tarifaFinal);
+    const valorTax = calcularValor(distanciaPercorrida, tarifaFinal);
+    const gpsConfiavel = gpsAtualizacoesValidas >= 2 && !gpsTeveBaixaPrecisao && gpsMaiorIntervaloMs <= 120000;
+    const fonteValor = gpsConfiavel ? 'GPS' : 'MAPS_FALLBACK';
+    valorFinal = gpsConfiavel ? valorTax : valorMaps;
     const valorEconomia = Math.max(0, valorMaps - valorTax);
 
     const btnIniciar = document.getElementById('btnIniciar');
@@ -661,6 +738,7 @@ function pararCorrida() {
 function salvarCorridaNoHistorico(valorMaps, valorTax, valorFinal, valorEconomia) {
     const corrida = {
         data: new Date().toLocaleString('pt-BR'),
+        dataISO: new Date().toISOString().slice(0,10),
         origem: document.getElementById('campoOrigem') ? document.getElementById('campoOrigem').value || '-' : '-',
         destino: document.getElementById('campoDestino') ? document.getElementById('campoDestino').value || '-' : '-',
         kmMaps: kmGoogleMaps,
@@ -668,6 +746,7 @@ function salvarCorridaNoHistorico(valorMaps, valorTax, valorFinal, valorEconomia
         valorMaps: valorMaps,
         valorTax: valorTax,
         valorFinal: valorFinal,
+        fonteValor: fonteValor,
         valorEconomia: valorEconomia,
         tarifa: document.getElementById('tipoTarifa') ? document.getElementById('tipoTarifa').innerText : ''
     };
@@ -679,11 +758,16 @@ function salvarCorridaNoHistorico(valorMaps, valorTax, valorFinal, valorEconomia
 function atualizarListaCorridas() {
     const lista = document.getElementById('listaCorridasHoje');
     if (!lista) return;
-    if (historicoCorridas.length === 0) {
-        lista.innerHTML = '<p style="color:#666; font-size:1em;">Nenhuma corrida registrada.</p>';
+    const hojeISO = new Date().toISOString().slice(0,10);
+    const hojeBR = new Date().toLocaleDateString('pt-BR');
+    const corridasHoje = historicoCorridas.filter(c =>
+        c.dataISO ? c.dataISO === hojeISO : String(c.data || '').startsWith(hojeBR)
+    );
+    if (corridasHoje.length === 0) {
+        lista.innerHTML = '<p style="color:#666; font-size:1em;">Nenhuma corrida registrada hoje.</p>';
         return;
     }
-    lista.innerHTML = historicoCorridas.map(c => {
+    lista.innerHTML = corridasHoje.map(c => {
         let economiaTexto = c.valorEconomia > 0 ? `<br>🎉 Economia: ${formatarValor(c.valorEconomia)}` : '';
         return `
         <div class="corrida-item">
@@ -698,14 +782,15 @@ function atualizarListaCorridas() {
 }
 
 function limparCorridasHoje() {
-    if (confirm('Limpar a lista de corridas?')) {
-        historicoCorridas = [];
-        localStorage.removeItem('historicoCorridas');
+    if (confirm('Limpar somente as corridas de hoje?')) {
+        const hojeISO = new Date().toISOString().slice(0,10);
+        historicoCorridas = historicoCorridas.filter(c => c.dataISO !== hojeISO);
+        localStorage.setItem('historicoCorridas', JSON.stringify(historicoCorridas));
         atualizarListaCorridas();
     }
 }
-function limp
-arCorridasHoje() {
+
+function limparTodoHistorico() {
     if (confirm('Apagar TODO o histórico de corridas?')) {
         historicoCorridas = [];
         localStorage.removeItem('historicoCorridas');
@@ -792,49 +877,140 @@ function compartilharWhatsapp() {
     window.open(url, '_blank');
 }
 
+function crc16CCITT(str) {
+    let crc = 0xFFFF;
+    for (let i = 0; i < str.length; i++) {
+        crc ^= str.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+            crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+            crc &= 0xFFFF;
+        }
+    }
+    return crc.toString(16).toUpperCase().padStart(4, '0');
+}
+
+function pixCampo(id, valor) {
+    const v = String(valor);
+    return String(id).padStart(2, '0') + String(v.length).padStart(2, '0') + v;
+}
+
+function montarPayloadPix(valor) {
+    if (!pixKey) return '';
+
+    const nome = (nomeMotorista || 'ADRIANO ALVES DE OLIVEIRA SOUZA')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^A-Za-z0-9 ]/g, ' ')
+        .replace(/\s+/g, ' ').trim().slice(0, 25).toUpperCase();
+
+    const cidade = (cidadeMotorista || 'TERESINA')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^A-Za-z0-9 ]/g, ' ')
+        .replace(/\s+/g, ' ').trim().slice(0, 15).toUpperCase();
+
+    const chave = String(pixKey).trim();
+    const valorNumerico = Number(valor || 0);
+
+    let payload = '';
+    payload += pixCampo('00', '01');
+    payload += pixCampo('26', pixCampo('00', 'BR.GOV.BCB.PIX') + pixCampo('01', chave));
+    payload += pixCampo('52', '0000');
+    payload += pixCampo('53', '986');
+
+    if (valorNumerico > 0) {
+        payload += pixCampo('54', valorNumerico.toFixed(2));
+    }
+
+    payload += pixCampo('58', 'BR');
+    payload += pixCampo('59', nome);
+    payload += pixCampo('60', cidade);
+    payload += pixCampo('62', pixCampo('05', '***'));
+    payload += '6304' + crc16CCITT(payload);
+
+    return payload;
+}
+
+function atualizarQRCodePix(payload) {
+    const img = document.getElementById('pixQRCode');
+    const aviso = document.getElementById('pixQrAviso');
+    if (!img || !payload) return;
+
+    img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=' + encodeURIComponent(payload);
+    img.style.display = 'block';
+    if (aviso) aviso.innerText = '📷 Aponte a câmera do banco para pagar.';
+}
+
 function gerarCodigoPix() {
-    if (!pixKey) { alert('Cadastre sua chave Pix em "Meus Dados"!'); return; }
-    const valorMaps = calcularValor(kmGoogleMaps, tarifaAtual);
-    const valorTax = calcularValor(distanciaPercorrida, tarifaAtual);
+    if (!pixKey) {
+        alert('Cadastre sua chave Pix em "Meus Dados"!');
+        return;
+    }
+
+    const tarifaParaPix = corridaAtiva ? tarifaCorrida : tarifaAtual;
+    const valorMaps = calcularValor(kmGoogleMaps, tarifaParaPix);
+    const valorTax = calcularValor(distanciaPercorrida, tarifaParaPix);
     const valorFinal = Math.min(valorMaps, valorTax);
+    const payload = montarPayloadPix(valorFinal);
+
     document.getElementById('pixValorDisplay').innerText = formatarValor(valorFinal);
-    document.getElementById('campoCodigoPixModal').value = `Chave Pix: ${pixKey}\nValor: ${formatarValor(valorFinal)}\nPagamento: Corrida de ${document.getElementById('campoOrigem').value || 'origem'} → ${document.getElementById('campoDestino').value || 'destino'}`;
+    document.getElementById('campoCodigoPixModal').value = payload;
+    atualizarQRCodePix(payload);
     abrirModal('pixModal');
 }
 
 function copiarCodigoPixModal() {
     const campo = document.getElementById('campoCodigoPixModal');
+    if (!campo) return;
+    campo.focus();
     campo.select();
-    document.execCommand('copy');
-    alert('✅ Código copiado!');
+    try {
+        document.execCommand('copy');
+        alert('✅ PIX Copia e Cola copiado!');
+    } catch (e) {
+        alert('Selecione e copie o código PIX manualmente.');
+    }
 }
 
-window.onload = function() {
+function iniciarAplicacao() {
+    console.log('✅ Iniciando aplicativo...');
+    
+    try {
+        const tarifasSalvas = localStorage.getItem('tarifas');
+        if (tarifasSalvas) {
+            Object.assign(tarifas, JSON.parse(tarifasSalvas));
+        }
+        
+        const historicoSalvo = localStorage.getItem('historicoCorridas');
+        if (historicoSalvo) {
+            const dados = JSON.parse(historicoSalvo);
+            historicoCorridas = Array.isArray(dados) ? dados : [];
+        }
+        
+        carregarDadosMotorista();
+        definirTarifaPorHorario();
+        atualizarTabelaTarifasUI();
+        atualizarListaCorridas();
+        atualizarTabelaSimulacao();
+    } catch (erro) {
+        console.error('Erro ao carregar dados:', erro);
+    }
+    
     setTimeout(() => {
-        document.getElementById('telaCarregamento').style.opacity = '0';
+        const tela = document.getElementById('telaCarregamento');
+        const conteudo = document.getElementById('conteudoPrincipal');
+        if (tela) tela.style.opacity = '0';
         setTimeout(() => {
-            document.getElementById('telaCarregamento').style.display = 'none';
-            document.getElementById('conteudoPrincipal').style.display = 'block';
+            if (tela) tela.style.display = 'none';
+            if (conteudo) conteudo.style.display = 'block';
+            console.log('✅ Aplicativo carregado!');
         }, 300);
     }, 800);
-    
-    const tarifasSalvas = localStorage.getItem('tarifas');
-    if (tarifasSalvas) {
-        Object.assign(tarifas, JSON.parse(tarifasSalvas));
-    }
-    
-    const historicoSalvo = localStorage.getItem('historicoCorridas');
-    if (historicoSalvo) {
-        historicoCorridas = JSON.parse(historicoSalvo);
-    }
-    
-    carregarDadosMotorista();
-    definirTarifaPorHorario();
-    atualizarTabelaTarifasUI();
-    atualizarListaCorridas();
-    atualizarTabelaSimulacao();
-};
+}
+
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    iniciarAplicacao();
+} else {
+    window.addEventListener('DOMContentLoaded', iniciarAplicacao);
+}
 </script>
 </body>
 </html>
-t
