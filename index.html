@@ -911,6 +911,13 @@ function atualizarQRCodePix(payload) {
     if (aviso) aviso.innerText = '📷 Aponte a câmera do banco para pagar.';
 }
 
+
+function arredondarParaDezCentavos(valor) {
+    // Mantém o cálculo do taxímetro exato na tela e arredonda
+    // somente o valor usado para cobrança via Pix.
+    return Math.round((Number(valor) + Number.EPSILON) * 10) / 10;
+}
+
 function gerarCodigoPix() {
     if (!pixKey) {
         alert('Cadastre sua chave Pix em "Meus Dados"!');
@@ -921,7 +928,8 @@ function gerarCodigoPix() {
     const valorMaps = calcularValor(kmGoogleMaps, tarifaParaPix);
     const valorTax = calcularValor(distanciaPercorrida, tarifaParaPix);
     const gpsConfiavel = gpsAtualizacoesValidas >= 2 && !gpsTeveBaixaPrecisao && gpsMaiorIntervaloMs <= 120000;
-    const valorFinalPix = corridaAtiva ? valorTax : (gpsConfiavel ? valorTax : valorMaps);
+    const valorFinalCalculadoPix = corridaAtiva ? valorTax : (gpsConfiavel ? valorTax : valorMaps);
+    const valorFinalPix = arredondarParaDezCentavos(valorFinalCalculadoPix);
     const payload = montarPayloadPix(valorFinalPix);
 
     document.getElementById('pixValorDisplay').innerText = formatarValor(valorFinalPix);
