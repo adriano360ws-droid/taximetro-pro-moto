@@ -331,6 +331,7 @@ let pixKey = "", nomeMotorista = "", cidadeMotorista = "", whatsApp = "";
 let historicoCorridas = [];
 let velocidadeMediaKmPorHora = 0;
 let ultimaAtualizacaoGPS = 0;
+let ultimoValorFinalCorrida = null;
 
 function alternarModoEscuro() {
     document.body.classList.toggle('dark-mode');
@@ -674,6 +675,7 @@ function pararCorrida() {
     const gpsConfiavel = gpsAtualizacoesValidas >= 2 && !gpsTeveBaixaPrecisao && gpsMaiorIntervaloMs <= 120000;
     const fonteValor = gpsConfiavel ? 'GPS' : 'MAPS_FALLBACK';
     const valorFinal = gpsConfiavel ? valorTax : valorMaps;
+    ultimoValorFinalCorrida = valorFinal;
     const valorEconomia = Math.max(0, valorMaps - valorTax);
 
     const btnIniciar = document.getElementById('btnIniciar');
@@ -927,8 +929,12 @@ function gerarCodigoPix() {
     const tarifaParaPix = corridaAtiva ? tarifaCorrida : tarifaAtual;
     const valorMaps = calcularValor(kmGoogleMaps, tarifaParaPix);
     const valorTax = calcularValor(distanciaPercorrida, tarifaParaPix);
-    const gpsConfiavel = gpsAtualizacoesValidas >= 2 && !gpsTeveBaixaPrecisao && gpsMaiorIntervaloMs <= 120000;
-    const valorFinalCalculadoPix = corridaAtiva ? valorTax : (gpsConfiavel ? valorTax : valorMaps);
+
+    // Depois de encerrar, o Pix usa exatamente o valor final cobrado.
+    const valorFinalCalculadoPix = corridaAtiva
+        ? valorTax
+        : (ultimoValorFinalCorrida !== null ? ultimoValorFinalCorrida : valorTax);
+
     const valorFinalPix = arredondarParaDezCentavos(valorFinalCalculadoPix);
     const payload = montarPayloadPix(valorFinalPix);
 
